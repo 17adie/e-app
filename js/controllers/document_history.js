@@ -164,6 +164,8 @@ $(document)
     let d = resp[0]
     console.log({d})
 
+    // todo: modal details and then the rest of the tables.
+
     app.loader('hide', '#modal-view_notif_details .modal-body');
 
   })
