@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>E-Approval</title>
+    <!-- Favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="../images/favicon.png">
+    <!-- Pignose Calender -->
+    <!-- <link href="../plugins/pg-calendar/css/pignose.calendar.min.css" rel="stylesheet"> -->
+    <!-- Chartist -->
+    <!-- <link rel="stylesheet" href="../plugins/chartist/css/chartist.min.css"> -->
+    <!-- <link rel="stylesheet" href="../plugins/chartist-plugin-tooltips/css/chartist-plugin-tooltip.css"> -->
+    <!-- Custom Stylesheet -->
+    <link href="../css/style.css" rel="stylesheet">
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <!-- <script src="../plugins/datatables/jquery.dataTables.min.css"></script> -->
+
+</head>
+
+<body>
+
+    <!--*******************
+        Preloader start
+    ********************-->
+    <div id="preloader">
+        <div class="loader">
+            <svg class="circular" viewBox="25 25 50 50">
+                <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="3" stroke-miterlimit="10" />
+            </svg>
+        </div>
+    </div>
+    <!--*******************
+        Preloader end
+    ********************-->
+    <div id="main-wrapper">
+        <!-- <div id="sidebar"></div> -->
+        <div id="navigator"></div>
+
+        <div class="content-body">
+
+            <h4 class="ml-3 mt-3">Dashboard</h4>
+
+            <div class="container-fluid mt-3">
+                <div class="row">
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="card gradient-1">
+                            <div class="card-body">
+                                <h3 class="card-title text-white">Forms</h3>
+                                <div class="d-inline-block">
+                                    <h2 class="text-white my_forms_submitted_count"></h2>
+                                    <!-- <p class="text-white mb-0">Jan - March 2019</p> -->
+                                </div>
+                                <span class="float-right display-5 opacity-5"><i class="fa fa-wpforms"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="card gradient-2">
+                            <div class="card-body">
+                                <h3 class="card-title text-white">Notification</h3>
+                                <div class="d-inline-block">
+                                    <h2 class="text-white my_notification_count"></h2>
+                                    <!-- <p class="text-white mb-0">Jan - March 2019</p> -->
+                                </div>
+                                <span class="float-right display-5 opacity-5"><i class="fa fa-bell-o"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="card gradient-3">
+                            <div class="card-body">
+                                <h3 class="card-title text-white">Request</h3>
+                                <div class="d-inline-block">
+                                    <h2 class="text-white my_document_request_count"></h2>
+                                    <!-- <p class="text-white mb-0">Jan - March 2019</p> -->
+                                </div>
+                                <span class="float-right display-5 opacity-5"><i class="fa fa-list-alt"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 col-sm-6">
+                        <div class="card gradient-4">
+                            <div class="card-body">
+                                <h3 class="card-title text-white">For Approvals</h3>
+                                <div class="d-inline-block">
+                                    <h2 class="text-white for_approval_count"></h2>
+                                    <!-- <p class="text-white mb-0">Jan - March 2019</p> -->
+                                </div>
+                                <span class="float-right display-5 opacity-5"><i class="fa fa-check-circle-o"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="container-fluid">
+                <div class="row">
+                    
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <h4 class="card-header custom-card-header-ongoing">My Recent Document Request (On-Going)</h4>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table header-border" id="request_tbl">
+                                        
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                    
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+    <div class="footer">
+      <div class="copyright">
+          <p>E-APPROVAL</p>
+      </div>
+    </div>
+  
+    
+    <script type="text/javascript">
+        $(document).ready( function () {
+            $("#navigator").load("navigator.html");
+        });
+    </script>
+
+    <script src="../plugins/common/common.min.js"></script>
+    <script src="../js/custom.min.js"></script>
+    <script src="../js/settings.js"></script>
+    <script src="../js/gleek.js"></script>
+    <script src="../js/styleSwitcher.js"></script>
+    <script src="../js/js.cookie.min.js"></script>
+    <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
+
+    <script src="../js/app.js"></script>
+    <script src="../js/controllers/dashboard.js"></script>
+    
+    
+
+</body>
+
+</html>

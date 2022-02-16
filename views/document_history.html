@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>E-Approval</title>
+    <!-- Favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="../images/favicon.png">
+    <!-- Pignose Calender -->
+    <!-- <link href="../plugins/pg-calendar/css/pignose.calendar.min.css" rel="stylesheet"> -->
+    <!-- Chartist -->
+    <!-- <link rel="stylesheet" href="../plugins/chartist/css/chartist.min.css"> -->
+    <!-- <link rel="stylesheet" href="../plugins/chartist-plugin-tooltips/css/chartist-plugin-tooltip.css"> -->
+    <!-- Custom Stylesheet -->
+    <link href="../plugins/sweetalert/css/sweetalert.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+    <script src="../js/jquery-3.6.0.min.js"></script>
+
+</head>
+
+<body>
+
+    <!--*******************
+        Preloader start
+    ********************-->
+    <div id="preloader">
+        <div class="loader">
+            <svg class="circular" viewBox="25 25 50 50">
+                <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="3" stroke-miterlimit="10" />
+            </svg>
+        </div>
+    </div>
+    <!--*******************
+        Preloader end
+    ********************-->
+    <div id="main-wrapper">
+        <!-- <div id="sidebar"></div> -->
+        <div id="navigator"></div>
+
+        <div class="content-body">
+            <h4 class="ml-3 mt-3">Document History</h4>
+
+            <div class="container-fluid mt-3">
+               
+                <div class="card">
+
+                    <div class="card-body">
+                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            <li class="nav-item">
+                              <a class="nav-link active" id="notification-history-tab" data-toggle="tab" href="#notification-history" role="tab" aria-controls="notification-history" aria-selected="true">
+                                  <i class="fa fa-envelope-o"></i> Notification History</a>
+                            </li>
+                            <li class="nav-item">
+                              <a class="nav-link" id="request-history-tab" data-toggle="tab" href="#request-history" role="tab" aria-controls="request-history" aria-selected="false">
+                                  <i class="fa fa-list-alt"></i> Request History</a>
+                            </li>
+                            <li class="nav-item">
+                              <a class="nav-link" id="cancel_history-tab" data-toggle="tab" href="#cancel_history" role="tab" aria-controls="cancel_history" aria-selected="false">
+                                  <i class="fa fa-exclamation-triangle"></i> Cancel History</a>
+                            </li>
+                            <li class="nav-item">
+                              <a class="nav-link" id="approval-history-tab" data-toggle="tab" href="#approval-history" role="tab" aria-controls="approval-history" aria-selected="false">
+                                  <i class="fa fa-check-circle-o"></i> Approval History</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="myTabContent">
+                            <div class="tab-pane fade show active" id="notification-history" role="tabpanel" aria-labelledby="notification-history-tab">
+
+                                <div class="container-fluid mt-3">
+               
+                                    <div class="card">
+                                        <h5 class="card-header custom-card-header">
+                                            Notification
+                                          </h5>
+                                        <div class="card-body">
+                                            <div class="table-responsive">
+                                                <table class="table header-border" id="notification_tbl">
+                                                    
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                            
+                                </div>
+
+                            </div>
+                            <div class="tab-pane fade" id="request-history" role="tabpanel" aria-labelledby="request-history-tab">...</div>
+                            <div class="tab-pane fade" id="cancel_history" role="tabpanel" aria-labelledby="cancel_history-tab">...</div>
+                            <div class="tab-pane fade" id="approval-history" role="tabpanel" aria-labelledby="approval-history-tab">...</div>
+                        </div>
+
+                        <!--    ADD AND EDIT BOOK MODAL-->
+				<div id="modal-view_notif_details" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false" >
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title book_inv_modal_title">Add New Book</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body custom-modal-height">
+                                <div class="row">
+                                    <div class="form-group col-md-4">
+                                        <label for="inp-title">Title</label> <span class="required"> * </span>
+                                        <input type="text" class="form-control" id="inp-title" placeholder="Title">
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="inp-isbn">ISBN</label> <span class="required"> * </span>
+                                        <input type="text" class="form-control" id="inp-isbn" placeholder="ISBN">
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="inp-author">Author</label> <span class="required"> * </span>
+                                        <input type="text" class="form-control" id="inp-author" placeholder="Author">
+                                    </div>
+                                </div>
+                                <hr/>
+                                <div class="row">
+                                                            <div class="form-group col-md-4">
+                                        <label for="inp-publisher">Publisher</label> <span class="required"> * </span>
+                                        <input type="text" class="form-control" id="inp-publisher" placeholder="Publisher">
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="inp-year_published">Year Published</label> <span class="required"> * </span>
+                                        <input type="text" class="form-control" id="inp-year_published" placeholder="Year Published">
+                                    </div>
+                                    <div class="form-group col-md-4">
+                                        <label for="inp-category">Category</label> <span class="required"> * </span>
+                                        <input type="text" class="form-control" id="inp-category" placeholder="Category">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <button id="btn-add_book" type="submit" class="btn btn-primary ladda-button" data-style="zoom-in"><span class="ladda-label"></span><i class="fa fa-check"></i> Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    
+                    </div>
+                </div>
+                
+
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+      <div class="copyright">
+          <p>E-APPROVAL</p>
+      </div>
+    </div>
+  
+    
+    <script type="text/javascript">
+        $(document).ready( function () {
+            $("#navigator").load("navigator.html");
+        });
+    </script>
+
+    <script src="../plugins/common/common.min.js"></script>
+    <script src="../js/custom.min.js"></script>
+    <script src="../js/settings.js"></script>
+    <script src="../js/gleek.js"></script>
+    <script src="../js/styleSwitcher.js"></script>
+    <script src="../js/js.cookie.min.js"></script>
+    <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="../plugins/sweetalert/js/sweetalert.min.js"></script>
+
+    <script src="../js/app.js"></script>
+    <script src="../js/controllers/document_history.js"></script>
+    
+    
+
+</body>
+
+</html>

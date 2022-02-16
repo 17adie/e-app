@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>E-Approval</title>
+    <!-- Favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="../images/favicon.png">
+    <!-- Pignose Calender -->
+    <!-- <link href="../plugins/pg-calendar/css/pignose.calendar.min.css" rel="stylesheet"> -->
+    <!-- Chartist -->
+    <!-- <link rel="stylesheet" href="../plugins/chartist/css/chartist.min.css"> -->
+    <!-- <link rel="stylesheet" href="../plugins/chartist-plugin-tooltips/css/chartist-plugin-tooltip.css"> -->
+    <!-- Custom Stylesheet -->
+    <link href="../plugins/sweetalert/css/sweetalert.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet"> 
+    <script src="../js/jquery-3.6.0.min.js"></script>
+<!--  -->
+</head>
+
+<body>
+
+    <!--*******************
+        Preloader start
+    ********************-->
+    <div id="preloader">
+        <div class="loader">
+            <svg class="circular" viewBox="25 25 50 50">
+                <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="3" stroke-miterlimit="10" />
+            </svg>
+        </div>
+    </div>
+    <!--*******************
+        Preloader end
+    ********************-->
+    <div id="main-wrapper">
+        <!-- <div id="sidebar"></div> -->
+        <div id="navigator"></div>
+
+        <div class="content-body">
+            <h4 class="ml-3 mt-3">Approve Document</h4>
+
+            <div class="container-fluid mt-3">
+               
+                <div class="card">
+                    <h5 class="card-header custom-card-header">
+                        For Approval List
+                      </h5>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table header-border" id="for_approval_request_tbl">
+                                
+                            </table>
+                        </div>
+                    </div>
+                </div>
+        
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+      <div class="copyright">
+          <p>E-APPROVAL</p>
+      </div>
+    </div>
+  
+    
+    <script type="text/javascript">
+        $(document).ready( function () {
+            $("#navigator").load("navigator.html");
+        });
+    </script>
+
+    <script src="../plugins/common/common.min.js"></script>
+    <script src="../js/custom.min.js"></script>
+    <script src="../js/settings.js"></script>
+    <script src="../js/gleek.js"></script>
+    <script src="../js/styleSwitcher.js"></script>
+    <script src="../js/js.cookie.min.js"></script>
+    <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="../plugins/sweetalert/js/sweetalert.min.js"></script>
+
+    <script src="../js/app.js"></script>
+    <script src="../js/controllers/approve_document.js"></script>
+    
+    
+
+</body>
+
+</html>
