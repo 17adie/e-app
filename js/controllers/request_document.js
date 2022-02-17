@@ -123,6 +123,12 @@ const main = {
 main.fn.get_form_list()
 main.fn.get_users()
 
+$('#date_needed').datepicker({
+  format: 'yyyy-mm-dd',
+  daysOfWeekDisabled: '06', // disable sat and sun
+  startDate: new Date() // disabled past dates
+});
+
 $(document)
 
 .off('click', '#btn-submit_document').on('click', '#btn-submit_document', function(){
@@ -182,5 +188,32 @@ $(document)
         })
       }
 
+
+})
+
+.off('change', '#date_needed').on('change', '#date_needed', function(){
+  
+  let date_needed = $(this).val()
+  let date_now = moment().format("YYYY-MM-DD");
+
+  var july4th = '2022-02-22';
+  var laborDay = '2022-02-23';
+ 
+  moment.updateLocale('en', {
+    holidays: [july4th, laborDay],
+    holidayFormat: 'YYYY-MM-DD'
+  }); 
+
+  let is_holiday = moment(date_needed, 'YYYY-MM-DD').isHoliday()
+
+  if(is_holiday) return console.log('holiday!!!!')
+
+
+  console.log({date_now})
+  console.log({date_needed})
+
+  var diff = moment(date_needed, 'YYYY-MM-DD').businessDiff(moment(date_now,'YYYY-MM-DD'));
+
+  console.log({diff})
 
 })
