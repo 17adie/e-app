@@ -67,74 +67,134 @@
                         </ul>
                         <div class="tab-content" id="myTabContent">
                             <div class="tab-pane fade show active" id="notification-history" role="tabpanel" aria-labelledby="notification-history-tab">
-
-                                <div class="container-fluid mt-3">
-               
-                                    <div class="card">
-                                        <h5 class="card-header custom-card-header">
-                                            Notification
-                                          </h5>
-                                        <div class="card-body">
-                                            <div class="table-responsive">
-                                                <table class="table header-border" id="notification_tbl">
-                                                    
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                            
+                               
+                                <div class="table-responsive">
+                                    <table class="table header-border" id="notification_tbl" width="100%" cellspacing="0">
+                                        
+                                    </table>
                                 </div>
 
                             </div>
-                            <div class="tab-pane fade" id="request-history" role="tabpanel" aria-labelledby="request-history-tab">...</div>
-                            <div class="tab-pane fade" id="cancel_history" role="tabpanel" aria-labelledby="cancel_history-tab">...</div>
-                            <div class="tab-pane fade" id="approval-history" role="tabpanel" aria-labelledby="approval-history-tab">...</div>
+                            <div class="tab-pane fade" id="request-history" role="tabpanel" aria-labelledby="request-history-tab">
+                                <div class="table-responsive">
+                                    <table class="table header-border" id="request_tbl" width="100%" cellspacing="0">
+                                        
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="cancel_history" role="tabpanel" aria-labelledby="cancel_history-tab">
+                                <div class="table-responsive">
+                                    <table class="table header-border" id="cancelled_tbl" width="100%">
+                                        
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="approval-history" role="tabpanel" aria-labelledby="approval-history-tab">
+                                <div class="table-responsive">
+                                    <table class="table header-border" id="approval_tbl" width="100%">
+                                        
+                                    </table>
+                                </div>
+                            </div>
                         </div>
 
-                        <!--    ADD AND EDIT BOOK MODAL-->
+                <!-- NOTIFICATION MODAL -->
 				<div id="modal-view_notif_details" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false" >
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title book_inv_modal_title">Add New Book</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
+                                <h5 class="modal-title">Request Summary</h5>
+                                <span class="label label-sm txt_document_status"></span>
                             </div>
-                            <div class="modal-body custom-modal-height">
-                                <div class="row">
-                                    <div class="form-group col-md-4">
-                                        <label for="inp-title">Title</label> <span class="required"> * </span>
-                                        <input type="text" class="form-control" id="inp-title" placeholder="Title">
+                            <div class="modal-body">
+                                <div class="container">
+                                    <h5>Request Details</h5>
+                                    <div class="custom-list-group">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Transaction #:</div>
+                                                    <div class="col-7 txt_trans_no"></div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Document:</div>
+                                                    <div class="col-7 txt_category"></div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Requestor:</div>
+                                                    <div class="col-7 txt_requestor"></div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Subject:</div>
+                                                    <div class="col-7 txt_document_title"></div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Message:</div>
+                                                    <div class="col-7 txt_requestor_message"></div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Date Requested:</div>
+                                                    <div class="col-7 txt_date_request"></div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Date Approved:</div>
+                                                    <div class="col-7 txt_date_approved"></div>
+                                                </div>
+                                            </li> 
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Approved By:</div>
+                                                    <div class="col-7 txt_approved_by"></div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Approver List</div>
+                                                    <div class="col-7 txt_approver_list"></div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Notified Person(s)</div>
+                                                    <div class="col-7 txt_notified_person_list"></div>
+                                                </div>
+                                            </li>
+                                          </ul>
                                     </div>
-                                    <div class="form-group col-md-4">
-                                        <label for="inp-isbn">ISBN</label> <span class="required"> * </span>
-                                        <input type="text" class="form-control" id="inp-isbn" placeholder="ISBN">
+                                    <h5>Attachments</h5>
+                                    <div class="custom-list-group">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Main Attachment:</div>
+                                                    <div class="col-7 file_main_attch"></div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Supporting Attachment:</div>
+                                                    <div class="col-7 file_sup_attch"></div>
+                                                </div>
+                                            </li>
+                                          </ul>
                                     </div>
-                                    <div class="form-group col-md-4">
-                                        <label for="inp-author">Author</label> <span class="required"> * </span>
-                                        <input type="text" class="form-control" id="inp-author" placeholder="Author">
-                                    </div>
-                                </div>
-                                <hr/>
-                                <div class="row">
-                                                            <div class="form-group col-md-4">
-                                        <label for="inp-publisher">Publisher</label> <span class="required"> * </span>
-                                        <input type="text" class="form-control" id="inp-publisher" placeholder="Publisher">
-                                    </div>
-                                    <div class="form-group col-md-4">
-                                        <label for="inp-year_published">Year Published</label> <span class="required"> * </span>
-                                        <input type="text" class="form-control" id="inp-year_published" placeholder="Year Published">
-                                    </div>
-                                    <div class="form-group col-md-4">
-                                        <label for="inp-category">Category</label> <span class="required"> * </span>
-                                        <input type="text" class="form-control" id="inp-category" placeholder="Category">
-                                    </div>
+                                   
                                 </div>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                                <button id="btn-add_book" type="submit" class="btn btn-primary ladda-button" data-style="zoom-in"><span class="ladda-label"></span><i class="fa fa-check"></i> Save</button>
                             </div>
                         </div>
                     </div>

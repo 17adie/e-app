@@ -14765,3 +14765,14 @@ html[dir="rtl"] [direction="rtl"][data-sidebar-style="compact"]:not([data-layout
 .custom_action_icon_btn {
   font-size: 1.5rem;
 }
+
+div.custom-list-group {
+  padding: 0.2rem;
+  background: #eee;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+}
+
+div.custom-list-group ul.list-group > li.list-group-item {
+  padding: 0.2rem 1.1rem !important;
+}
