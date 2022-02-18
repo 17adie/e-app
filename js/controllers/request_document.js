@@ -4,6 +4,25 @@ let uid = app.cookie.get("uid");
 
 const main = {
   fn: {
+    date_picker: function(){
+      $('#date_needed').datepicker({
+        format: 'yyyy-mm-dd',
+        daysOfWeekDisabled: '06', // disable sat and sun
+        startDate: new Date() // disabled past dates
+      });
+    },
+    get_holiday: function(){
+      app.get_list.request('sp-get_holiday', function (resp) {
+
+      let hdate = resp.map(v => v.holiday_date)
+
+      moment.updateLocale('en', {
+        holidays: hdate,
+        holidayFormat: 'YYYY-MM-DD'
+      });
+   
+      })
+    },
     get_form_list: function(){
      
       app.get_list.request('sp-get_forms', function (resp) {
@@ -122,12 +141,9 @@ const main = {
 
 main.fn.get_form_list()
 main.fn.get_users()
+main.fn.get_holiday()
+main.fn.date_picker()
 
-$('#date_needed').datepicker({
-  format: 'yyyy-mm-dd',
-  daysOfWeekDisabled: '06', // disable sat and sun
-  startDate: new Date() // disabled past dates
-});
 
 $(document)
 
@@ -143,14 +159,19 @@ $(document)
       multiple_approver = $('.select-multiple-approver').val(),
       multiple_notification = $('.select-multiple-notification').val(),
 
-      form = $('#form_form').val();
-      
+      form = $('#form_form').val(),
+      expected_days = $('#expected_days').val();
 
-      if((!doc_title || !req_message || !date_needed) || multiple_approver.length == 0 || !main_attachment.val()) {
+      console.log({expected_days})
+
+      if((!doc_title || !req_message || !date_needed) || !form || multiple_approver.length == 0 || !main_attachment.val()) {
         swal('Invalid', 'Please fill in all the required fields.', 'warning')
         Ladda.stopAll()
       } else if(form === 'prf' && !support_attachment.val()) { // required supporting document
         swal('Invalid', 'Please attach Supporting Document', 'warning')
+        Ladda.stopAll()
+      } else if (expected_days < 10){
+        swal('Invalid', 'Expected days should be greater than or equal to 10 days', 'warning')
         Ladda.stopAll()
       } else {
         app.uploader(main_attachment, 'upload_file',function (cb) {
@@ -195,25 +216,15 @@ $(document)
   
   let date_needed = $(this).val()
   let date_now = moment().format("YYYY-MM-DD");
-
-  var july4th = '2022-02-22';
-  var laborDay = '2022-02-23';
- 
-  moment.updateLocale('en', {
-    holidays: [july4th, laborDay],
-    holidayFormat: 'YYYY-MM-DD'
-  }); 
-
   let is_holiday = moment(date_needed, 'YYYY-MM-DD').isHoliday()
 
-  if(is_holiday) return console.log('holiday!!!!')
-
-
-  console.log({date_now})
-  console.log({date_needed})
+  if(is_holiday) {
+    swal('This is holiday', '', 'error')
+    $('#date_needed').val('')
+  }
 
   var diff = moment(date_needed, 'YYYY-MM-DD').businessDiff(moment(date_now,'YYYY-MM-DD'));
-
-  console.log({diff})
+  
+  $('#expected_days').val(diff);
 
 })
