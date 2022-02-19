@@ -1,6 +1,7 @@
 Ladda.bind('.ladda-button')
 
 let uid = app.cookie.get("uid");
+let get_email_list = []
 
 const main = {
   fn: {
@@ -88,6 +89,8 @@ const main = {
       app.crud.request('sp-get_users', params, function (resp) {
         let u_data = resp
 
+        get_email_list = u_data
+
         console.log({u_data})
 
         $('.select-multiple-approver').select2();
@@ -162,52 +165,70 @@ $(document)
       form = $('#form_form').val(),
       expected_days = $('#expected_days').val();
 
-      console.log({expected_days})
 
-      if((!doc_title || !req_message || !date_needed) || !form || multiple_approver.length == 0 || !main_attachment.val()) {
-        swal('Invalid', 'Please fill in all the required fields.', 'warning')
-        Ladda.stopAll()
-      } else if(form === 'prf' && !support_attachment.val()) { // required supporting document
-        swal('Invalid', 'Please attach Supporting Document', 'warning')
-        Ladda.stopAll()
-      } else if (expected_days < 10){
-        swal('Invalid', 'Expected days should be greater than or equal to 10 days', 'warning')
-        Ladda.stopAll()
-      } else {
-        app.uploader(main_attachment, 'upload_file',function (cb) {
-          let main_file = cb
-          app.uploader(support_attachment, 'upload_file',function (cb) {
-            let sup_file = cb
-              main.fn.add.approval_document(doc_title, req_message, date_needed, main_file, sup_file, form, function(resp){
-                let {approval_id} = resp[0]
+      let email_to = []
+      let email_cc = []
+      get_email_list.forEach((element) => { 
+       
+        if(multiple_approver.includes(element.tbl_id)) {
+          email_to.push(element.email)
+        }
 
-                console.log({approval_id})
+        if(multiple_notification.includes(element.tbl_id)) {
+          email_cc.push(element.email)
+        }
 
-                multiple_approver.forEach((element) => { 
-                  main.fn.add.approver(approval_id, element, function(){
-                    console.log('approver')
-                  })
-                 })
+      })
+
+      console.log({email_to})
+      console.log({email_cc})
+
+      Ladda.stopAll()
+
+      // if((!doc_title || !req_message || !date_needed) || !form || multiple_approver.length == 0 || !main_attachment.val()) {
+      //   swal('Invalid', 'Please fill in all the required fields.', 'warning')
+      //   Ladda.stopAll()
+      // } else if(form === 'prf' && !support_attachment.val()) { // required supporting document
+      //   swal('Invalid', 'Please attach Supporting Document', 'warning')
+      //   Ladda.stopAll()
+      // } else if (expected_days < 3){
+      //   swal('Invalid', 'Expected days should be greater than or equal to 3 working days', 'warning')
+      //   Ladda.stopAll()
+      // } else {
+      //   app.uploader(main_attachment, 'upload_file',function (cb) {
+      //     let main_file = cb
+      //     app.uploader(support_attachment, 'upload_file',function (cb) {
+      //       let sup_file = cb
+      //         main.fn.add.approval_document(doc_title, req_message, date_needed, main_file, sup_file, form, function(resp){
+      //           let {approval_id} = resp[0]
+
+      //           console.log({approval_id})
+
+      //           multiple_approver.forEach((element) => { 
+      //             main.fn.add.approver(approval_id, element, function(){
+      //               console.log('approver')
+      //             })
+      //            })
                 
-                 multiple_notification.forEach((element) => { 
-                  main.fn.add.notification(approval_id, element, function(){
-                    console.log('notification')
+      //            multiple_notification.forEach((element) => { 
+      //             main.fn.add.notification(approval_id, element, function(){
+      //               console.log('notification')
                     
-                  })
-                 })
+      //             })
+      //            })
 
-                 Ladda.stopAll()
+      //            Ladda.stopAll()
 
-                 $('input, type, select').val('')
-                 $(".select-multiple-approver").val([]).change();
-                 $(".select-multiple-notification").val([]).change();
+      //            $('input, type, select').val('')
+      //            $(".select-multiple-approver").val([]).change();
+      //            $(".select-multiple-notification").val([]).change();
 
-                 swal('Success', 'Document has been successfully submitted', 'success')
+      //            swal('Success', 'Document has been successfully submitted', 'success')
 
-              })
-          })
-        })
-      }
+      //         })
+      //     })
+      //   })
+      // }
 
 
 })
