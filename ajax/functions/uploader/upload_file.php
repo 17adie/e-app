@@ -1,4 +1,7 @@
 <?php
+
+header('Access-Control-Allow-Origin: *');
+
 if ( 0 < $_FILES['file']['error'] ) {
     echo 'Error: ' . $_FILES['file']['error'] . '<br>';
 }
