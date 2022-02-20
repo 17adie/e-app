@@ -139,6 +139,21 @@ const main = {
         })
       },
     },
+    email_notification: function(subject, message, to, cc, cb){
+      $.ajax({
+        url:server_url + '/ajax/email_notification.php',
+        type:'post',
+        data:{
+            subject: subject,
+            message: message,
+            to: to,
+            cc: cc,
+        },
+        success:function(resp){
+            return cb(resp);
+        }
+    });
+    },
   }  
 }
 
@@ -165,9 +180,9 @@ $(document)
       form = $('#form_form').val(),
       expected_days = $('#expected_days').val();
 
-
       let email_to = []
       let email_cc = []
+
       get_email_list.forEach((element) => { 
        
         if(multiple_approver.includes(element.tbl_id)) {
@@ -180,55 +195,58 @@ $(document)
 
       })
 
-      console.log({email_to})
-      console.log({email_cc})
+      // console.log({email_to})
+      // console.log({email_cc})
 
-      Ladda.stopAll()
+      if((!doc_title || !req_message || !date_needed) || !form || multiple_approver.length == 0 || !main_attachment.val()) {
+        swal('Invalid', 'Please fill in all the required fields.', 'warning')
+        Ladda.stopAll()
+      } else if(form === 'prf' && !support_attachment.val()) { // required supporting document
+        swal('Invalid', 'Please attach Supporting Document', 'warning')
+        Ladda.stopAll()
+      } else if (expected_days < 3){
+        swal('Invalid', 'Expected days should be greater than or equal to 3 working days', 'warning')
+        Ladda.stopAll()
+      } else {
+        app.uploader(main_attachment, 'upload_file',function (cb) {
+          let main_file = cb
+          app.uploader(support_attachment, 'upload_file',function (cb) {
+            let sup_file = cb
+              main.fn.add.approval_document(doc_title, req_message, date_needed, main_file, sup_file, form, function(resp){
+                let {approval_id} = resp[0]
 
-      // if((!doc_title || !req_message || !date_needed) || !form || multiple_approver.length == 0 || !main_attachment.val()) {
-      //   swal('Invalid', 'Please fill in all the required fields.', 'warning')
-      //   Ladda.stopAll()
-      // } else if(form === 'prf' && !support_attachment.val()) { // required supporting document
-      //   swal('Invalid', 'Please attach Supporting Document', 'warning')
-      //   Ladda.stopAll()
-      // } else if (expected_days < 3){
-      //   swal('Invalid', 'Expected days should be greater than or equal to 3 working days', 'warning')
-      //   Ladda.stopAll()
-      // } else {
-      //   app.uploader(main_attachment, 'upload_file',function (cb) {
-      //     let main_file = cb
-      //     app.uploader(support_attachment, 'upload_file',function (cb) {
-      //       let sup_file = cb
-      //         main.fn.add.approval_document(doc_title, req_message, date_needed, main_file, sup_file, form, function(resp){
-      //           let {approval_id} = resp[0]
+                console.log({approval_id})
+               
+                 main.fn.email_notification(doc_title, req_message, email_to, email_cc, function(resp){
+                  console.log({resp})
 
-      //           console.log({approval_id})
+                  multiple_approver.forEach((element) => { 
+                    main.fn.add.approver(approval_id, element, function(){
+                      console.log('approver')
+                    })
+                   })
+                  
+                   multiple_notification.forEach((element) => { 
+                    main.fn.add.notification(approval_id, element, function(){
+                      console.log('notification')
+                      
+                    })
+                   })
+  
+                Ladda.stopAll()
 
-      //           multiple_approver.forEach((element) => { 
-      //             main.fn.add.approver(approval_id, element, function(){
-      //               console.log('approver')
-      //             })
-      //            })
-                
-      //            multiple_notification.forEach((element) => { 
-      //             main.fn.add.notification(approval_id, element, function(){
-      //               console.log('notification')
-                    
-      //             })
-      //            })
+                 $('input, type, select').val('')
+                 $(".select-multiple-approver").val([]).change();
+                 $(".select-multiple-notification").val([]).change();
 
-      //            Ladda.stopAll()
+                 swal('Success', 'Document has been successfully submitted', 'success')
+                  
+                })
 
-      //            $('input, type, select').val('')
-      //            $(".select-multiple-approver").val([]).change();
-      //            $(".select-multiple-notification").val([]).change();
-
-      //            swal('Success', 'Document has been successfully submitted', 'success')
-
-      //         })
-      //     })
-      //   })
-      // }
+              })
+          })
+        })
+      }
 
 
 })
@@ -240,8 +258,10 @@ $(document)
   let is_holiday = moment(date_needed, 'YYYY-MM-DD').isHoliday()
 
   if(is_holiday) {
-    swal('This is holiday', '', 'error')
     $('#date_needed').val('')
+    $('#expected_days').val('');
+    swal('This is holiday', '', 'error')
+    return
   }
 
   var diff = moment(date_needed, 'YYYY-MM-DD').businessDiff(moment(date_now,'YYYY-MM-DD'));
