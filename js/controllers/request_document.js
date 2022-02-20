@@ -71,7 +71,8 @@ const main = {
               let url = f_data.find(url => url.form_code === form_val)
 
               // download link
-              window.location.href= server_url + '/forms/'+ url.url
+              window.open( server_url + '/forms/'+ url.url , '_blank')
+              // window.location.href= server_url + '/forms/'+ url.url
               
             } else {
               swal('Invalid Input','Please select value from Category and Form', 'error')

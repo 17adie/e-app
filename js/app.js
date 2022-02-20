@@ -119,7 +119,7 @@ const app = {
         l_encr: function(str, callback){
 
             $.ajax({
-                url:'ajax/functions/enc-dec/encr.php',
+                url: server_url + '/ajax/functions/enc-dec/encr.php',
                 type:'post',
                 data:{
                     str: str
@@ -134,7 +134,7 @@ const app = {
         l_auth: function(str, h, callback){
 
             $.ajax({
-                url:'ajax/functions/enc-dec/decr.php',
+                url: server_url + '/ajax/functions/enc-dec/decr.php',
                 type:'post',
                 data:{
                     str: str,
