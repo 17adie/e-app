@@ -98,7 +98,7 @@ const main = {
         $('.select-multiple-notification').select2();
 
         let user_data = u_data.map((v,i) => {
-          return(`<option value="${v.tbl_id}">${v.first_name + ' ' + v.last_name}</option>`)
+          return(`<option value="${v.tbl_id}">${v.last_name + ' ' + v.first_name}</option>`)
         })
 
         $('.select-multiple-approver').html(user_data)
@@ -107,7 +107,7 @@ const main = {
       })
     },
     add: {
-      approval_document: function(doc_title, req_message, date_needed, main_file, sup_file, form_code, cb){
+      approval_document: function(doc_title, req_message, date_needed, main_file, sup_file, form_code, expected_days, cb){
         const params = {
           _requestor_id : uid,
           _document_title : doc_title,
@@ -115,7 +115,9 @@ const main = {
           _filename_main : main_file,
           _filename_sup : sup_file,
           _requestor_message : req_message,
-          _form_code : form_code
+          _form_code : form_code,
+          // _prio_lvl : prio_lvl,
+          _expected_days : expected_days,
         }
         app.crud.request('sp-add_document_approval', params, function (resp) {
           return cb(resp)
@@ -180,6 +182,8 @@ $(document)
 
       form = $('#form_form').val(),
       expected_days = $('#expected_days').val();
+      // prio_lvl =  $('#prio_lvl').val();
+
 
       let email_to = []
       let email_cc = []
@@ -199,7 +203,7 @@ $(document)
       // console.log({email_to})
       // console.log({email_cc})
 
-      if((!doc_title || !req_message || !date_needed) || !form || multiple_approver.length == 0 || !main_attachment.val()) {
+      if((!doc_title || !req_message || !date_needed) || !form || multiple_approver.length == 0 || !expected_days || !main_attachment.val()) {
         swal('Invalid', 'Please fill in all the required fields.', 'warning')
         Ladda.stopAll()
       } else if(form === 'prf' && !support_attachment.val()) { // required supporting document
@@ -213,7 +217,7 @@ $(document)
           let main_file = cb
           app.uploader(support_attachment, 'upload_file',function (cb) {
             let sup_file = cb
-              main.fn.add.approval_document(doc_title, req_message, date_needed, main_file, sup_file, form, function(resp){
+              main.fn.add.approval_document(doc_title, req_message, date_needed, main_file, sup_file, form, expected_days, function(resp){
                 let {approval_id} = resp[0]
 
                 console.log({approval_id})

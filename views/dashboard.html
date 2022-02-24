@@ -14,6 +14,7 @@
     <!-- <link rel="stylesheet" href="../plugins/chartist/css/chartist.min.css"> -->
     <!-- <link rel="stylesheet" href="../plugins/chartist-plugin-tooltips/css/chartist-plugin-tooltip.css"> -->
     <!-- Custom Stylesheet -->
+    <link href="../plugins/sweetalert/css/sweetalert.css" rel="stylesheet">
     <link href="../css/style.css" rel="stylesheet">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="../js/jquery-3.6.0.min.js"></script>
@@ -113,10 +114,123 @@
                             </div>
                         </div>
                     </div>
-                    
-                    
-                    
+             
                 </div>
+
+                <!-- NOTIFICATION MODAL -->
+				<div id="modal-view_docs_details" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false" >
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Request Summary</h5>
+                                <span class="label label-sm txt_document_status gradient-4"></span>
+                            </div>
+                            <div class="modal-body">
+                                <div class="container">
+                                    <h5>Request Details</h5>
+                                    <div class="custom-list-group">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Transaction #:</div>
+                                                    <div class="col-7 txt_trans_no"></div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Document:</div>
+                                                    <div class="col-7 txt_category"></div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Requestor:</div>
+                                                    <div class="col-7 txt_requestor"></div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Subject:</div>
+                                                    <div class="col-7 txt_document_title"></div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Message:</div>
+                                                    <div class="col-7 txt_requestor_message"></div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Date Requested:</div>
+                                                    <div class="col-7 txt_date_request"></div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Date Needed:</div>
+                                                    <div class="col-7 txt_date_needed"></div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Expected No. of Day(s):</div>
+                                                    <div class="col-7 txt_no_of_days"></div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Date Approved:</div>
+                                                    <div class="col-7 txt_date_approved"></div>
+                                                </div>
+                                            </li> 
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Approved By:</div>
+                                                    <div class="col-7 txt_approved_by"></div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Approver List</div>
+                                                    <div class="col-7 txt_approver_list"></div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Notified Person(s)</div>
+                                                    <div class="col-7 txt_notified_person_list"></div>
+                                                </div>
+                                            </li>
+                                          </ul>
+                                    </div>
+                                    <h5>Attachments</h5>
+                                    <div class="custom-list-group">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Main Attachment:</div>
+                                                    <div class="col-7 file_main_attch"></div>
+                                                </div>
+                                            </li>
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <div class="col-5 label">Supporting Attachment:</div>
+                                                    <div class="col-7 file_sup_attch"></div>
+                                                </div>
+                                            </li>
+                                          </ul>
+                                    </div>
+                                   
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
 
 
@@ -142,6 +256,9 @@
     <script src="../js/styleSwitcher.js"></script>
     <script src="../js/js.cookie.min.js"></script>
     <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="../js/moment.min.js"></script>
+    <script src="../js/moment-business-days.js"></script>
+    <script src="../plugins/sweetalert/js/sweetalert.min.js"></script>
 
     <script src="../js/app.js"></script>
     <script src="../js/controllers/dashboard.js"></script>

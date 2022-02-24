@@ -4,6 +4,33 @@ let uid = app.cookie.get('uid');
 
 const main = {
   fn: {
+    get_holiday: function(){
+        app.get_list.request('sp-get_holiday', function (resp) {
+  
+        let hdate = resp.map(v => v.holiday_date)
+  
+        moment.updateLocale('en', {
+          holidays: hdate,
+          holidayFormat: 'YYYY-MM-DD'
+        });
+     
+        })
+      },
+    cancel_document: function(tbl_id, cb){
+        const params = {
+            _tbl_id: tbl_id,
+          };
+          app.crud.request('sp-cancel_document', params, function (resp) {
+            return cb(resp)
+          })
+    },
+    calculate_days: function(date_needed){
+
+        let date_now = moment().format("YYYY-MM-DD");
+        let diff = moment(date_needed, 'YYYY-MM-DD').businessDiff(moment(date_now,'YYYY-MM-DD'));
+
+        return diff;
+    },
     tbl: {
 
       // DATATABLES
@@ -12,10 +39,12 @@ const main = {
           let unfiltered_rows_count;
 
           const columns = [
-              {data: "tbl_id", title: "Transaction #", className: 'tbl_id'},
+              {data: "trans_no", title: "Transaction #", className: 'trans_no'},
               {data: "document_title", title: "Document", className: 'document_title'},
               {data: "date_needed", title: "Date Needed", className: 'date_needed'},
-              {data: "status", title: "Status", className: 'status'},
+              {data: "status", title: "Status", className: 'status', sortable : false},
+              {title: "Priority", className: 'priority_level', sortable : false},
+              {title: "Actions", className: 'td_action', sortable : false}
           ]
 
           $('#request_tbl').dataTable({
@@ -27,8 +56,21 @@ const main = {
                   infoFiltered: "", 
               },
               columns: columns,
-              order: [[ 0, "asc" ]],    // ORDER BY 0 = id_num
-             
+              order: [[ 2, "asc" ]],    // ORDER BY 0 = id_num
+              columnDefs: [
+                {
+                    render: function ( data, type, row ) {
+                        return row.tbl_id + ' ' + row.tbl_id;
+                    },
+                    targets: -1,
+                },
+                {
+                    render: function ( data, type, row ) {
+                        return row.tbl_id;
+                    },
+                    targets: -2,
+                }
+            ],
               ajax: function (data, callback, settings) {
 
                   const params = {
@@ -38,11 +80,11 @@ const main = {
                       _sort_direction: data.order[0].dir
 
                   };
-                  console.log({params})
+                //   console.log({params})
                   app.view_table.request('sp-get_document_request', params, function (response) {
                     
                       let resp = response.data || [];
-                    console.log(resp)
+                    // console.log(resp)
                      
                       if (data.draw === 1) { // if this is the first draw, which means it is unfiltered
                           unfiltered_rows_count = response._total_count;
@@ -61,6 +103,26 @@ const main = {
               },
               createdRow: function( row, data, dataIndex ) {
 
+                $( row ).find('td:eq(-1)')
+                .html(`
+                <div style="display:flex">
+                  <a href="javascript:void(0)" data-target="#modal-view_docs_details" data-toggle="modal" class="custom_action_icon_btn text-warning view_request" data-toggle="tooltip" data-placement="top" title="View" data-original-title="View">
+                    <i class="fa fa-file-text"></i>
+                  </a>
+                  <a href="javascript:void(0)" class="custom_action_icon_btn text-danger ml-3 cancel_request" data-toggle="tooltip" data-placement="top" title="Cancel" data-original-title="Cancel">
+                    <i class="fa fa-remove"></i>
+                  </a>
+                </div>
+                `
+                );
+
+                  $( row ).find('td:eq(-1) > div > a')
+                      .attr({
+                          'data-tbl_id': data.tbl_id,
+                          'data-document_title': data.document_title,
+                          'data-trans_no': data.trans_no,
+                  });
+
                   // DISPLAY STATUS WITH TEXT
                   var stat;
 
@@ -68,15 +130,6 @@ const main = {
                       case '0':
                           stat = '<span class="label label-sm gradient-4">For Approval</span>';
                           break;
-                      // case '1':
-                      //     stat = '<span class="label label-sm label-success">Document Approved</span>';
-                      //     break;
-                      // case '2':
-                      //     stat = '<span class="label label-sm label-success">Document Disapproved</span>';
-                      //     break;
-                      // case '3':
-                      //     stat = '<span class="label label-sm label-success">Cancelled</span>';
-                      //     break;
                       default:
                           stat = '<span class="label label-sm label-danger">N/A</span>';
                           break;
@@ -88,6 +141,28 @@ const main = {
                           "data-tbl_id": data.tbl_id
                       });
 
+                
+                // DISPLAY PRIO WITH TEXT
+                let prio;
+
+                let date_needed = moment(data.date_needed, 'YYYY-MM-DD')
+                let diff = main.fn.calculate_days(date_needed)
+
+                if(diff < 3) { // alert when less than 3 days
+                    prio = '<span class="label label-sm label-danger">High</span>';
+                } else if (diff > 2 && diff < 6){ // alert when 3 - 5 days
+                    prio = '<span class="label label-sm label-warning">Medium</span>';
+                } else if (diff > 5) { // alert when greater than 6 days
+                    prio = '<span class="label label-sm label-success">Low</span>';
+                } else {
+                    prio = '<span class="label label-sm label-error">N/A</span>';
+                }
+
+              $( row ).find('td.priority_level').html(prio)
+
+                
+                    
+
                   $(row).addClass('hover_cls');
 
               }
@@ -98,7 +173,7 @@ const main = {
   }
 }
 
-
+main.fn.get_holiday()
 app.get.dashboard_count(uid, function(resp) {
   main.fn.tbl.my_request()
 
@@ -111,3 +186,90 @@ app.get.dashboard_count(uid, function(resp) {
 
 })
 
+
+$(document)
+
+.off('click','.view_request').on('click','.view_request', function(){
+    let { tbl_id } = $(this).data()
+    app.loader('show', '#modal-view_docs_details .modal-body');
+    app.get.notif_details(tbl_id, function(resp){
+        let d = resp[0]
+        // console.log({d})
+    
+        let approver = d.approver_list.split(',')
+    
+        let approver_list = approver.map((v,i) => {
+            return(`<div>${v}</div>`)
+        }) 
+
+        // if not null
+
+        let notif_list = 'N/A';
+      
+
+        if(d.notified_person_list) {
+            let notif = d.notified_person_list.split(',')
+    
+            notif_list = notif.map((v,i) => {
+                return(`<div>${v}</div>`)
+            }) 
+
+        }
+
+        $('.txt_notified_person_list').html(notif_list)
+    
+
+        let url_main = server_url + '/uploads/'+ d.filename_main
+        let download_link_main = `<a href="${url_main}" class="custom_action_icon_btn text-primary" target="_blank"><i class="fa fa-file-text-o"></i></a>`;
+        let url_sup = server_url + '/uploads/'+ d.filename_sup
+        let download_link_sup = `<a href="${url_sup}" class="custom_action_icon_btn text-primary" target="_blank"><i class="fa fa-file-text-o"></i></a>`;
+    
+        let date_needed = moment(d.date_needed, 'YYYY-MM-DD')
+
+        $('.txt_document_status').html('For Approval')
+        $('.txt_trans_no').html(d.trans_no)
+        $('.txt_category').html(d.category)
+        $('.txt_requestor').html(d.requestor)
+        $('.txt_document_title').html(d.category)
+        $('.txt_requestor_message').html(d.requestor_message)
+        $('.txt_date_request').html(d.date_request)
+        $('.txt_date_approved').html(d.date_approved)
+        $('.txt_approved_by').html(d.approved_by)
+        $('.txt_date_needed').html(d.date_needed)
+        $('.txt_no_of_days').html(main.fn.calculate_days(date_needed))
+    
+        $('.txt_approver_list').html(approver_list)
+        
+        $('.file_main_attch').html(d.filename_main == '' || d.filename_main == null ? 'NA' : download_link_main)
+        $('.file_sup_attch').html(d.filename_sup == '' || d.filename_sup == null ? 'NA' : download_link_sup)
+    
+        app.loader('hide', '#modal-view_docs_details .modal-body');
+    
+      })
+
+})
+
+.off('click','.cancel_request').on('click','.cancel_request', function(){
+    let { tbl_id , trans_no, document_title} = $(this).data()
+
+    let text = `Trans#: ${trans_no} \n Document: ${document_title}`
+
+    swal({
+        title:"Are you sure you want to cancel?",
+        text: text,
+        type:"info",
+        showCancelButton:!0,
+        confirmButtonColor:"#DD6B55",
+        confirmButtonText:"Yes",
+        closeOnConfirm:!1
+    },function(){
+        
+        main.fn.cancel_document(tbl_id, function(resp){
+            swal('Document Cancelled!','','success');
+            $('#request_tbl').DataTable().draw(false) // refresh with false = to retain page when draw
+        })
+        
+    })
+ 
+
+})

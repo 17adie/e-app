@@ -12,7 +12,7 @@ const main = {
 
           const columns = [
               {data: "read_status", title: "", className: 'read_status'},
-              {data: "tbl_id", title: "TRANS#", className: 'tbl_id', sortable : false},
+              {data: "trans_no", title: "TRANS#", className: 'trans_no', sortable : false},
               {data: "category", title: "Form", className: 'category'},
               {data: "status", title: "Document Status", className: 'status'},
               {data: "requestor", title: "Requestor", className: 'requestor'},
@@ -124,7 +124,7 @@ const main = {
         let unfiltered_rows_count;
 
         const columns = [
-            {data: "tbl_id", title: "TRANS#", className: 'tbl_id', sortable : false},
+            {data: "trans_no", title: "TRANS#", className: 'trans_no', sortable : false},
             {data: "document_title", title: "Subject", className: 'document_title'},
             {data: "category", title: "Form", className: 'category'},
             {data: "status", title: "Document Status", className: 'status'},
@@ -223,12 +223,13 @@ const main = {
       let unfiltered_rows_count;
 
       const columns = [
-          {data: "tbl_id", title: "TRANS#", className: 'tbl_id', sortable : false},
+          {data: "trans_no", title: "TRANS#", className: 'trans_no', sortable : false},
           {data: "document_title", title: "Subject", className: 'document_title'},
           {data: "category", title: "Form", className: 'category'},
           {data: "status", title: "Document Status", className: 'status'},
           {data: "date_request", title: "Date Requested", className: 'date_request'},
           {data: "date_approved", title: "Date Approved", className: 'date_approved'},
+        //   {title: "Actions", className: 'td_action', sortable : false}
       ]
 
       $('#request_tbl').dataTable({
@@ -322,7 +323,7 @@ const main = {
     let unfiltered_rows_count;
 
     const columns = [
-        {data: "tbl_id", title: "TRANS#", className: 'tbl_id', sortable : false},
+        {data: "trans_no", title: "TRANS#", className: 'trans_no', sortable : false},
         {data: "document_title", title: "Subject", className: 'document_title'},
         {data: "category", title: "Form", className: 'category'},
         {data: "status", title: "Document Status", className: 'status'},
@@ -518,7 +519,7 @@ $(document)
 
     }
 
-    $('.txt_trans_no').html(d.tbl_id)
+    $('.txt_trans_no').html(d.trans_no)
     $('.txt_category').html(d.category)
     $('.txt_requestor').html(d.requestor)
     $('.txt_document_title').html(d.category)

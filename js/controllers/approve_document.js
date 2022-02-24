@@ -73,10 +73,10 @@ const main = {
                 $( row ).find('td:eq(-1)')
                 .html(`
                 <div style="display:flex">
-                  <a href="javascript:void(0)" class="custom_action_icon_btn text-success approve_docs" data-toggle="tooltip" data-placement="top" title="" data-original-title="Approve">
+                  <a href="javascript:void(0)" class="custom_action_icon_btn text-success approve_docs" data-toggle="tooltip" data-placement="top" title="Approve" data-original-title="Approve">
                     <i class="fa fa-check-circle-o"></i>
                   </a>
-                  <a href="javascript:void(0)" class="custom_action_icon_btn text-danger ml-2 disapprove_docs" data-toggle="tooltip" data-placement="top" title="" data-original-title="Disapprove">
+                  <a href="javascript:void(0)" class="custom_action_icon_btn text-danger ml-2 disapprove_docs" data-toggle="tooltip" data-placement="top" title="Disapprove" data-original-title="Disapprove">
                     <i class="fa fa-remove"></i>
                   </a>
                 </div>
