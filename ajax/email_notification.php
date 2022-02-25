@@ -43,7 +43,7 @@ if(isset($_POST['subject']) && isset($_POST['message']) && isset($_POST['to'])){
     $mail->Port       = 465;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
 
     $mail->isHTML(true);                                  //Set email format to HTML
-    $mail->setFrom('forprojects.2022@gmail.com', 'E-APP NOTIFICATION');
+    $mail->setFrom(EMAIL, 'E-APP NOTIFICATION');
     $mail->Subject = $subject;
     $mail->Body    = $mes;
 
