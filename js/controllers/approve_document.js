@@ -11,7 +11,7 @@ const main = {
           let unfiltered_rows_count;
 
           const columns = [
-              {data: "tbl_id", title: "TRANS#", className: 'tbl_id'},
+              {data: "trans_no", title: "TRANS#", className: 'trans_no'},
               {data: "requestor_name", title: "Requestor", className: 'requestor_name'},
               {data: "filename_main", title: "Document File", className: 'filename_main', sortable : false},
               {data: "document_title", title: "Subject", className: 'document_title'},

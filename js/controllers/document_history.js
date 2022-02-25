@@ -14,10 +14,10 @@ const main = {
               {data: "read_status", title: "", className: 'read_status'},
               {data: "trans_no", title: "TRANS#", className: 'trans_no', sortable : false},
               {data: "category", title: "Form", className: 'category'},
-              {data: "status", title: "Document Status", className: 'status'},
+              {data: "docs_status", title: "Document Status", className: 'docs_status'},
               {data: "requestor", title: "Requestor", className: 'requestor'},
               {data: "date_request", title: "Date Requested", className: 'date_request'},
-              {data: "date_approved", title: "Date Approved", className: 'date_approved'},
+            //   {data: "date_approved", title: "Date Approved", className: 'date_approved'},
           ]
 
           $('#notification_tbl').dataTable({
@@ -32,7 +32,7 @@ const main = {
                 searchPlaceholder: "Forms, Requestor"
             },
               columns: columns,
-              order: [[ 0, "asc" ], [ 6, "asc" ]],  
+              order: [[ 0, "asc" ], [ 5, "asc" ]],  
               columnDefs: [
                 {
                     render: function ( data, type, row ) {
@@ -55,6 +55,7 @@ const main = {
                   app.view_table.request_search('sp-get_all_notification', params, function (response) {
                     
                       let resp = response.data || [];
+                    //   console.log({resp})
                       
                       if (data.draw === 1) { // if this is the first draw, which means it is unfiltered
                           unfiltered_rows_count = response._total_count;
@@ -74,28 +75,28 @@ const main = {
               createdRow: function( row, data, dataIndex ) {
 
                 // DISPLAY STATUS WITH TEXT
-                let stat;
+                let docs_status;
 
-                switch(data.status){
+                switch(data.docs_status){
                     case '0':
-                        stat = '<span class="label label-sm gradient-4">Ongoing</span>';
+                        docs_status = '<span class="label label-sm gradient-4">Ongoing</span>';
                         break;
                     case '1':
-                        stat = '<span class="label label-sm gradient-1">Approved</span>';
+                        docs_status = '<span class="label label-sm gradient-1">Approved</span>';
                         break;
                     case '2':
-                        stat = '<span class="label label-sm gradient-2">Disapproved</span>';
+                        docs_status = '<span class="label label-sm gradient-2">Disapproved</span>';
                         break;
                     case '3':
-                        stat = '<span class="label label-sm gradient-2">Cancelled</span>';
+                        docs_status = '<span class="label label-sm gradient-2">Cancelled</span>';
                         break;
                     default:
-                        stat = '<span class="label label-sm label-danger">N/A</span>';
+                        docs_status = '<span class="label label-sm label-danger">N/A</span>';
                         break;
                 }
 
-                $( row ).find('td.status')
-                    .html(stat)
+                $( row ).find('td.docs_status')
+                    .html(docs_status)
                     .attr({
                         "data-tbl_id": data.tbl_id
                     });
@@ -104,10 +105,10 @@ const main = {
 
                 $( row ).find('td.read_status')
                   .html(data.read_status != 1 ?`
-                   <a href="javascript:;" data-target="#modal-view_notif_details" data-toggle="modal" data-tbl_id="${data.tbl_id}" data-read_status="${data.read_status}" data-notification_id="${data.notification_id}" class="btn text-warning tooltips btn-read_message">
+                   <a href="javascript:;" data-target="#modal-view_notif_details" data-toggle="modal" data-docs_status="${data.docs_status}" data-tbl_id="${data.tbl_id}" data-read_status="${data.read_status}" data-notification_id="${data.notification_id}" class="btn text-warning tooltips btn-read_message">
                     <i class="fa fa-envelope tooltips" data-placement="top" title="Unread" ></i>
                    </a>` : 
-                  `<a href="javascript:;" data-target="#modal-view_notif_details" data-toggle="modal" data-tbl_id="${data.tbl_id}" data-read_status="${data.read_status}" data-notification_id="${data.notification_id}" class="btn tooltips btn-read_message">
+                  `<a href="javascript:;" data-target="#modal-view_notif_details" data-toggle="modal" data-docs_status="${data.docs_status}" data-tbl_id="${data.tbl_id}" data-read_status="${data.read_status}" data-notification_id="${data.notification_id}" class="btn tooltips btn-read_message">
                   <i class="fa fa-envelope-open tooltips" data-placement="top" title="Read"></i>
                   <span></span>
                   </a>`
@@ -129,7 +130,8 @@ const main = {
             {data: "category", title: "Form", className: 'category'},
             {data: "status", title: "Document Status", className: 'status'},
             {data: "date_request", title: "Date Requested", className: 'date_request'},
-            {data: "date_approved", title: "Date Approved", className: 'date_approved'},
+            {data: "cancelled_date", title: "Date Cancelled", className: 'cancelled_date'},
+            {title: "Actions", className: 'td_action', sortable : false}
         ]
 
         $('#cancelled_tbl').dataTable({
@@ -150,7 +152,7 @@ const main = {
                   render: function ( data, type, row ) {
                       return row.tbl_id + ' ' + row.tbl_id;
                   },
-                  // targets: -1
+                  targets: -1
               }
           ],
            
@@ -184,6 +186,23 @@ const main = {
                 });
             },
             createdRow: function( row, data, dataIndex ) {
+
+            $( row ).find('td:eq(-1)')
+                .html(`
+                <div style="display:flex">
+                <a href="javascript:void(0)" data-target="#modal-view_notif_details" data-toggle="modal" class="custom_action_icon_btn text-warning view_docs_details" data-toggle="tooltip" data-placement="top" title="View" data-original-title="View">
+                    <i class="fa fa-file-text"></i>
+                </a>
+                </div>
+                `
+                );
+
+              $( row ).find('td:eq(-1) > div > a')
+                  .attr({
+                      'data-tbl_id': data.tbl_id,
+                      'data-docs_status': 3,
+                      'data-trans_no': data.trans_no,
+              });
 
               // DISPLAY STATUS WITH TEXT
               let stat;
@@ -226,10 +245,10 @@ const main = {
           {data: "trans_no", title: "TRANS#", className: 'trans_no', sortable : false},
           {data: "document_title", title: "Subject", className: 'document_title'},
           {data: "category", title: "Form", className: 'category'},
-          {data: "status", title: "Document Status", className: 'status'},
+          {data: "docs_status", title: "Document Status", className: 'docs_status'},
           {data: "date_request", title: "Date Requested", className: 'date_request'},
-          {data: "date_approved", title: "Date Approved", className: 'date_approved'},
-        //   {title: "Actions", className: 'td_action', sortable : false}
+        //   {data: "date_approved", title: "Date Approved", className: 'date_approved'},
+          {title: "Actions", className: 'td_action', sortable : false}
       ]
 
       $('#request_tbl').dataTable({
@@ -250,7 +269,7 @@ const main = {
                 render: function ( data, type, row ) {
                     return row.tbl_id + ' ' + row.tbl_id;
                 },
-                // targets: -1
+                targets: -1
             }
         ],
          
@@ -267,6 +286,7 @@ const main = {
               app.view_table.request_search('sp-get_all_request_history', params, function (response) {
                 
                   let resp = response.data || [];
+                //   console.log({resp})
                   
                   if (data.draw === 1) { // if this is the first draw, which means it is unfiltered
                       unfiltered_rows_count = response._total_count;
@@ -285,29 +305,43 @@ const main = {
           },
           createdRow: function( row, data, dataIndex ) {
 
-            // DISPLAY STATUS WITH TEXT
-            let stat;
+            $( row ).find('td:eq(-1)')
+            .html(`
+            <div style="display:flex">
+              <a href="javascript:void(0)" data-target="#modal-view_notif_details" data-toggle="modal" class="custom_action_icon_btn text-warning view_docs_details" data-toggle="tooltip" data-placement="top" title="View" data-original-title="View">
+                <i class="fa fa-file-text"></i>
+              </a>
+            </div>
+            `
+            );
 
-            switch(data.status){
+              $( row ).find('td:eq(-1) > div > a')
+                  .attr({
+                      'data-tbl_id': data.tbl_id,
+                      'data-docs_status': data.docs_status,
+                      'data-trans_no': data.trans_no,
+              });
+
+            // DISPLAY STATUS WITH TEXT
+            let docs_status;
+
+            switch(data.docs_status){
                 case '0':
-                    stat = '<span class="label label-sm gradient-4">Ongoing</span>';
+                    docs_status = '<span class="label label-sm gradient-4">Ongoing</span>';
                     break;
                 case '1':
-                    stat = '<span class="label label-sm gradient-1">Approved</span>';
+                    docs_status = '<span class="label label-sm gradient-1">Approved</span>';
                     break;
                 case '2':
-                    stat = '<span class="label label-sm gradient-2">Disapproved</span>';
+                    docs_status = '<span class="label label-sm gradient-2">Disapproved</span>';
                     break;
-                // case '3':
-                //     stat = '<span class="label label-sm gradient-2">Cancelled</span>';
-                //     break;
                 default:
-                    stat = '<span class="label label-sm label-danger">N/A</span>';
+                    docs_status = '<span class="label label-sm label-danger">N/A</span>';
                     break;
             }
 
-            $( row ).find('td.status')
-                .html(stat)
+            $( row ).find('td.docs_status')
+                .html(docs_status)
                 .attr({
                     "data-tbl_id": data.tbl_id
                 });
@@ -326,10 +360,11 @@ const main = {
         {data: "trans_no", title: "TRANS#", className: 'trans_no', sortable : false},
         {data: "document_title", title: "Subject", className: 'document_title'},
         {data: "category", title: "Form", className: 'category'},
-        {data: "status", title: "Document Status", className: 'status'},
+        {data: "docs_status", title: "Document Status", className: 'docs_status'},
         {data: "requestor", title: "Requestor", className: 'requestor'},
         {data: "date_request", title: "Date Requested", className: 'date_request'},
-        {data: "date_approved", title: "Date Approved", className: 'date_approved'},
+        {title: "Actions", className: 'td_action', sortable : false}
+        // {data: "date_approved", title: "Date Approved", className: 'date_approved'},
     ]
 
     $('#approval_tbl').dataTable({
@@ -350,7 +385,7 @@ const main = {
               render: function ( data, type, row ) {
                   return row.tbl_id + ' ' + row.tbl_id;
               },
-              // targets: -1
+              targets: -1
           }
       ],
        
@@ -385,10 +420,27 @@ const main = {
         },
         createdRow: function( row, data, dataIndex ) {
 
+            $( row ).find('td:eq(-1)')
+            .html(`
+            <div style="display:flex">
+              <a href="javascript:void(0)" data-target="#modal-view_notif_details" data-toggle="modal" class="custom_action_icon_btn text-warning view_docs_details" data-toggle="tooltip" data-placement="top" title="View" data-original-title="View">
+                <i class="fa fa-file-text"></i>
+              </a>
+            </div>
+            `
+            );
+
+              $( row ).find('td:eq(-1) > div > a')
+                  .attr({
+                      'data-tbl_id': data.tbl_id,
+                      'data-docs_status': data.docs_status,
+                      'data-trans_no': data.trans_no,
+              });
+
           // DISPLAY STATUS WITH TEXT
           let stat;
 
-          switch(data.status){
+          switch(data.docs_status){
               case '0':
                   stat = '<span class="label label-sm gradient-4">Ongoing</span>';
                   break;
@@ -406,7 +458,7 @@ const main = {
                   break;
           }
 
-          $( row ).find('td.status')
+          $( row ).find('td.docs_status')
               .html(stat)
               .attr({
                   "data-tbl_id": data.tbl_id
@@ -428,6 +480,75 @@ const main = {
       return cb(resp)
   });
   },
+  get_docs_details: function(tbl_id, docs_status, cb){
+    const params = {
+        _approval_id: tbl_id
+    };
+    app.crud.request('sp-get_notification_details', params, function (resp) {
+
+    let d = resp[0]
+
+    let approver = d.approver_list.split(',')
+
+    let approver_list = approver.map((v,i) => {
+        return(`<div>${v}</div>`)
+    }) 
+
+    let notif_list = 'N/A';
+      
+
+    if(d.notified_person_list) {
+        let notif = d.notified_person_list.split(',')
+
+        notif_list = notif.map((v,i) => {
+            return(`<div>${v}</div>`)
+        }) 
+
+    }
+    
+    let url_main = server_url + '/uploads/'+ d.filename_main
+    let download_link_main = `<a href="${url_main}" class="custom_action_icon_btn text-primary" target="_blank"><i class="fa fa-file-text-o"></i></a>`;
+    let url_sup = server_url + '/uploads/'+ d.filename_sup
+    let download_link_sup = `<a href="${url_sup}" class="custom_action_icon_btn text-primary" target="_blank"><i class="fa fa-file-text-o"></i></a>`;
+
+    let d_stat = $('.txt_document_status');
+
+    switch(docs_status){
+      case 0: 
+        d_stat.html('Ongoing').addClass('gradient-4').removeClass('gradient-1 gradient-2')
+      break
+      case 1: 
+        d_stat.html('Approved').addClass('gradient-1').removeClass('gradient-4 gradient-2')
+      break
+      case 2: 
+        d_stat.html('Disapproved').addClass('gradient-2').removeClass('gradient-1 gradient-4')
+      break
+      case 3: 
+        d_stat.html('Cancelled').addClass('gradient-2').removeClass('gradient-1 gradient-4')
+      break
+      default:
+        console.log('errorrr')
+      break
+
+    }
+
+    $('.txt_trans_no').html(d.trans_no)
+    $('.txt_category').html(d.category)
+    $('.txt_requestor').html(d.requestor)
+    $('.txt_document_title').html(d.category)
+    $('.txt_requestor_message').html(d.requestor_message)
+    $('.txt_date_request').html(d.date_request)
+
+    $('.txt_approver_list').html(approver_list)
+    $('.txt_notified_person_list').html(notif_list)
+    $('.file_main_attch').html(d.filename_main == '' || d.filename_main == null ? 'NA' : download_link_main)
+    $('.file_sup_attch').html(d.filename_sup == '' || d.filename_sup == null ? 'NA' : download_link_sup)
+
+    app.loader('hide', '#modal-view_notif_details .modal-body');
+
+        return cb(resp)
+    });
+  }
     
 }
 }
@@ -438,16 +559,20 @@ main.fn.tbl.cancelled()
 main.fn.tbl.request()
 main.fn.tbl.approval()
 
-
+$('#modal-view_notif_details').on('hidden.bs.modal', function () {
+    $(this).find("div.col-7").html('').end()
+    $('.txt_document_status').html('')
+})
 
 $(document) 
 
+
 .off('click', '.btn-read_message').on('click', '.btn-read_message', function(){
-  let {tbl_id, read_status, notification_id} = $(this).data()
+  let {tbl_id, read_status, notification_id, docs_status} = $(this).data()
   // console.log({read_status})
   // console.log({tbl_id})
   // console.log({notification_id})
-
+ 
 
   if(!read_status) {
     main.fn.update_read(notification_id, function(){
@@ -474,7 +599,7 @@ $(document)
   app.loader('show', '#modal-view_notif_details .modal-body');
   app.get.notif_details(tbl_id, function(resp){
     let d = resp[0]
-    console.log({d})
+    // console.log({d})
 
     let approver = d.approver_list.split(',')
 
@@ -498,19 +623,21 @@ $(document)
     // console.log({download_link_main})
     // console.log({download_link_sup})
 
+    
     let d_stat = $('.txt_document_status');
+    // console.log({docs_status})
 
-    switch(d.status){
-      case '0': 
+    switch(docs_status){
+      case 0: 
         d_stat.html('Ongoing').addClass('gradient-4').removeClass('gradient-1 gradient-2')
       break
-      case '1': 
+      case 1: 
         d_stat.html('Approved').addClass('gradient-1').removeClass('gradient-4 gradient-2')
       break
-      case '2': 
+      case 2: 
         d_stat.html('Disapproved').addClass('gradient-2').removeClass('gradient-1 gradient-4')
       break
-      case '3': 
+      case 3: 
         d_stat.html('Cancelled').addClass('gradient-2').removeClass('gradient-1 gradient-4')
       break
       default:
@@ -525,8 +652,8 @@ $(document)
     $('.txt_document_title').html(d.category)
     $('.txt_requestor_message').html(d.requestor_message)
     $('.txt_date_request').html(d.date_request)
-    $('.txt_date_approved').html(d.date_approved)
-    $('.txt_approved_by').html(d.approved_by)
+    // $('.txt_date_approved').html(d.date_approved)
+    // $('.txt_approved_by').html(d.approved_by)
 
     $('.txt_approver_list').html(approver_list)
     $('.txt_notified_person_list').html(notif_list)
@@ -538,6 +665,20 @@ $(document)
 
   })
 
+
+})
+
+
+.off('click', '.view_docs_details').on('click', '.view_docs_details', function(){
+    let {tbl_id , docs_status, trans_no} = $(this).data()
+
+    // console.log({trans_no})
+    // console.log({tbl_id})
+    // console.log({docs_status})
+
+    app.loader('show', '#modal-view_notif_details .modal-body');
+    main.fn.get_docs_details(tbl_id, docs_status, function(){
+    })
 
 })
 

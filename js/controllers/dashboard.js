@@ -42,7 +42,7 @@ const main = {
               {data: "trans_no", title: "Transaction #", className: 'trans_no'},
               {data: "document_title", title: "Document", className: 'document_title'},
               {data: "date_needed", title: "Date Needed", className: 'date_needed'},
-              {data: "status", title: "Status", className: 'status', sortable : false},
+              {title: "Status", className: 'status', sortable : false},
               {title: "Priority", className: 'priority_level', sortable : false},
               {title: "Actions", className: 'td_action', sortable : false}
           ]
@@ -69,6 +69,12 @@ const main = {
                         return row.tbl_id;
                     },
                     targets: -2,
+                },
+                {
+                    render: function ( data, type, row ) {
+                        return row.tbl_id;
+                    },
+                    targets: -3,
                 }
             ],
               ajax: function (data, callback, settings) {
@@ -84,7 +90,7 @@ const main = {
                   app.view_table.request('sp-get_document_request', params, function (response) {
                     
                       let resp = response.data || [];
-                    // console.log(resp)
+                    console.log(resp)
                      
                       if (data.draw === 1) { // if this is the first draw, which means it is unfiltered
                           unfiltered_rows_count = response._total_count;
@@ -124,19 +130,19 @@ const main = {
                   });
 
                   // DISPLAY STATUS WITH TEXT
-                  var stat;
+                //   var stat;
 
-                  switch(data.status){
-                      case '0':
-                          stat = '<span class="label label-sm gradient-4">For Approval</span>';
-                          break;
-                      default:
-                          stat = '<span class="label label-sm label-danger">N/A</span>';
-                          break;
-                  }
+                //   switch(data.status){
+                //       case '0':
+                //           stat = '<span class="label label-sm gradient-4">For Approval</span>';
+                //           break;
+                //       default:
+                //           stat = '<span class="label label-sm label-danger">N/A</span>';
+                //           break;
+                //   }
 
                   $( row ).find('td.status')
-                      .html(stat)
+                      .html('<span class="label label-sm gradient-4">For Approval</span>')
                       .attr({
                           "data-tbl_id": data.tbl_id
                       });
@@ -233,8 +239,8 @@ $(document)
         $('.txt_document_title').html(d.category)
         $('.txt_requestor_message').html(d.requestor_message)
         $('.txt_date_request').html(d.date_request)
-        $('.txt_date_approved').html(d.date_approved)
-        $('.txt_approved_by').html(d.approved_by)
+        // $('.txt_date_approved').html(d.date_approved)
+        // $('.txt_approved_by').html(d.approved_by)
         $('.txt_date_needed').html(d.date_needed)
         $('.txt_no_of_days').html(main.fn.calculate_days(date_needed))
     

@@ -2,6 +2,7 @@ Ladda.bind('.ladda-button')
 
 let uid = app.cookie.get("uid");
 let get_email_list = []
+let requestor;
 
 const main = {
   fn: {
@@ -94,7 +95,9 @@ const main = {
 
         console.log({u_data})
 
-        $('.select-multiple-approver').select2();
+        $('.select-multiple-approver').select2({
+          maximumSelectionLength: 3
+        });
         $('.select-multiple-notification').select2();
 
         let user_data = u_data.map((v,i) => {
@@ -142,7 +145,7 @@ const main = {
         })
       },
     },
-    email_notification: function(subject, message, to, cc, cb){
+    email_notification: function(subject, message, to, cc, trans_no, date_needed, cb){
       $.ajax({
         url:server_url + '/ajax/email_notification.php',
         type:'post',
@@ -151,6 +154,9 @@ const main = {
             message: message,
             to: to,
             cc: cc,
+            trans_no: trans_no,
+            date_needed: date_needed,
+            requestor: requestor,
         },
         success:function(resp){
             return cb(resp);
@@ -164,6 +170,10 @@ main.fn.get_form_list()
 main.fn.get_users()
 main.fn.get_holiday()
 main.fn.date_picker()
+app.get.user_details(uid, function(resp){
+  let ud = resp = undefined ? '' : resp[0]
+    requestor = ud.last_name + ', ' + ud.first_name;
+})
 
 
 $(document)
@@ -183,7 +193,6 @@ $(document)
       form = $('#form_form').val(),
       expected_days = $('#expected_days').val();
       // prio_lvl =  $('#prio_lvl').val();
-
 
       let email_to = []
       let email_cc = []
@@ -218,11 +227,11 @@ $(document)
           app.uploader(support_attachment, 'upload_file',function (cb) {
             let sup_file = cb
               main.fn.add.approval_document(doc_title, req_message, date_needed, main_file, sup_file, form, expected_days, function(resp){
-                let {approval_id} = resp[0]
+                let {approval_id, trans_no} = resp[0]
 
                 console.log({approval_id})
                
-                 main.fn.email_notification(doc_title, req_message, email_to, email_cc, function(resp){
+                 main.fn.email_notification(doc_title, req_message, email_to, email_cc, trans_no, date_needed, function(resp){
                   console.log({resp})
 
                   multiple_approver.forEach((element) => { 
