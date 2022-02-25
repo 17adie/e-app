@@ -25,6 +25,11 @@ if(isset($_POST['subject']) && isset($_POST['message']) && isset($_POST['to'])){
   $message = $_POST['message'];
   $tos = $_POST['to'];
   $ccs = $_POST['cc'];
+  $trans_no = $_POST['trans_no'];
+  $date_needed = $_POST['date_needed'];
+  $requestor = $_POST['requestor'];
+
+  $mes = "Trans No.: " . $trans_no . "<br>" . "Requestor: " . $requestor . "<br>" . "Date Needed: " . $date_needed . "<br>" . "Message: " . $message;
 
   try {
     //Server settings
@@ -40,7 +45,7 @@ if(isset($_POST['subject']) && isset($_POST['message']) && isset($_POST['to'])){
     $mail->isHTML(true);                                  //Set email format to HTML
     $mail->setFrom('forprojects.2022@gmail.com', 'E-APP NOTIFICATION');
     $mail->Subject = $subject;
-    $mail->Body    = $message;
+    $mail->Body    = $mes;
 
     // $mail->addAttachment('uploads/'. $main_atch, 'Main Document');
     // if($sup_atch) {
