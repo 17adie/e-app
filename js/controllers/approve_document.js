@@ -107,12 +107,13 @@ const main = {
       },
     
   },
-  docs_verification: function(approval_id, approver_id, type, d_remarks, cb){
+  docs_verification: function(approval_id, approver_id, type, d_remarks, disapprove_file, cb){
     const params = {
       _approval_id: approval_id,
       _approver_id: approver_id,
       _type: type,
-      _disapprove_remarks: d_remarks
+      _disapprove_remarks: d_remarks,
+      _disapprove_file: disapprove_file
     };
     console.log({params})
     app.crud.request('sp-update_approval_status', params, function (resp) {
@@ -131,23 +132,39 @@ $(document)
 .off('click', '.approve_docs').on('click', '.approve_docs', function(){
   let {tbl_id, approver_id, document_title, requestor_name} = $(this).data()
 
-  let text = `Subject: ${document_title} \n Requestor: ${requestor_name}`
+  let text = `<small>Subject: </small> ${document_title} <br> <small>Requestor: </small> ${requestor_name}`
 
-  swal({
+  // swal({
+  //   title:"Are you sure you want to approve this document?",
+  //   text: text,
+  //   type:"info",
+  //   showCancelButton:!0,
+  //   confirmButtonColor:"#DD6B55",
+  //   confirmButtonText:"Yes",
+  //   closeOnConfirm:!1
+  // },function(){
+  //   main.fn.docs_verification(tbl_id, approver_id, 'a', '', function(resp){
+  //     swal('Document Approved!','','success');
+  //     $('#for_approval_request_tbl').DataTable().draw(false) // refresh with false = to retain page when draw
+  //     })
+  // })
+
+  Swal.fire({
     title:"Are you sure you want to approve this document?",
-    text: text,
-    type:"info",
-    showCancelButton:!0,
-    confirmButtonColor:"#DD6B55",
-    confirmButtonText:"Yes",
-    closeOnConfirm:!1
-  },function(){
-    main.fn.docs_verification(tbl_id, approver_id, 'a', '', function(resp){
-      swal('Document Approved!','','success');
-      $('#for_approval_request_tbl').DataTable().draw(false) // refresh with false = to retain page when draw
-      })
-  })
+    html: text,
+    icon:'question',
+    showCancelButton: true,
+    confirmButtonText: 'Yes!',
+  }).then((result) => {
 
+    if (result.isConfirmed) {
+      main.fn.docs_verification(tbl_id, approver_id, 'a', '', '', function(resp){
+        Swal.fire('Document Approved!', '', 'success')
+        $('#for_approval_request_tbl').DataTable().draw(false) // refresh with false = to retain page when draw
+      })
+    }
+
+  })
   
 
 })
@@ -156,32 +173,79 @@ $(document)
   let {tbl_id, approver_id, document_title, requestor_name} = $(this).data()
 
   let text = `Subject: ${document_title} \n Requestor: ${requestor_name}`
-  swal({
+  // swal({
+  //   title:"Are you sure you want to disapprove this document?",
+  //   text: text,
+  //   html: '<input type="text">',
+  //   type:"input",
+  //   inputPlaceholder: 'Please enter reason',
+  //   showCancelButton:!0,
+  //   confirmButtonColor:"#DD6B55",
+  //   confirmButtonText:"Yes",
+  //   closeOnConfirm: !1
+  // },function(inputValue){
+    
+  //   if (inputValue === false) return false; // for cancel button
+
+  //   let reason = inputValue.trim()
+
+  //   if(reason) {
+  //     main.fn.docs_verification(tbl_id, approver_id, 'd', reason, function(){
+  //     swal('Document Dispproved!',"Reason: " + inputValue,'error');
+  //     $('#for_approval_request_tbl').DataTable().draw(false) // refresh with false = to retain page when draw
+  //     })
+  //   } else {
+  //     swal.showInputError("You need to write something!");
+  //   }
+    
+  // })
+
+  Swal.fire({
     title:"Are you sure you want to disapprove this document?",
-    text: text,
-    type:"input",
-    inputPlaceholder: 'Please enter reason',
-    showCancelButton:!0,
-    confirmButtonColor:"#DD6B55",
-    confirmButtonText:"Yes",
-    closeOnConfirm: !1
-  },function(inputValue){
+    icon: 'question',
+    html: `<div class="form-group">
+              <textarea type="text" class="form-control" id="d_reason" placeholder="Enter the Reason"></textarea>
+            </div>
+            <div class="form-group">
+              <input type="file" class="form-control" id="d_file">
+              <small class="form-text text-muted">Attach file (optional)</small>
+            </div>`,
+    confirmButtonText: 'Yes!',
+    showCancelButton: true,
+    focusConfirm: false,
+    allowOutsideClick: false,
+    allowEscapeKey: false,
+    showLoaderOnConfirm: true,
+    preConfirm: () => {
+      let d_reason = Swal.getPopup().querySelector('#d_reason').value
     
-    if (inputValue === false) return false; // for cancel button
+      // console.log({d_reason})
+      // console.log({d_file})
 
-    let reason = inputValue.trim()
-
-    if(reason) {
-      main.fn.docs_verification(tbl_id, approver_id, 'd', reason, function(){
-      swal('Document Dispproved!',"Reason: " + inputValue,'error');
-      $('#for_approval_request_tbl').DataTable().draw(false) // refresh with false = to retain page when draw
-      })
-    } else {
-      swal.showInputError("You need to write something!");
+      if (!d_reason.trim()) {
+        Swal.showValidationMessage(`Please enter the reason`)
+      }
+      return { reason: d_reason }
     }
-    
-  })
+  }).then((result) => {
 
+    console.log({result})
+    if (result.isConfirmed) {
+      
+      let reason = result.value.reason
+      let file = $('#d_file')
+
+      app.uploader(file, 'upload_file',function (cb) {
+        let file = cb
+        main.fn.docs_verification(tbl_id, approver_id, 'd', reason, file, function(){
+          Swal.fire('Document Dispproved!', 'Reason: ' + reason, 'error')
+          $('#for_approval_request_tbl').DataTable().draw(false) // refresh with false = to retain page when draw
+        })
+      })
+
+    }
+
+  })
   
 
 })

@@ -9,6 +9,7 @@ const main = {
     date_picker: function(){
       $('#date_needed').datepicker({
         format: 'yyyy-mm-dd',
+        todayHighlight: true,
         daysOfWeekDisabled: '06', // disable sat and sun
         startDate: new Date() // disabled past dates
       });
@@ -209,6 +210,7 @@ $(document)
 
       })
 
+      console.log({main_attachment})
       // console.log({email_to})
       // console.log({email_cc})
 
