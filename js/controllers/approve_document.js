@@ -4,6 +4,13 @@ let uid = app.cookie.get('uid');
 
 const main = {
   fn: {
+    calculate_days: function(date_needed){
+
+      let date_now = moment().format("YYYY-MM-DD");
+      let diff = moment(date_needed, 'YYYY-MM-DD').businessDiff(moment(date_now,'YYYY-MM-DD'));
+
+      return diff;
+    },
     tbl: {
       // DATATABLES
       to_approve_documents: function() {
@@ -18,6 +25,7 @@ const main = {
               {data: "requestor_message", title: "Message", className: 'requestor_message', sortable : false},
               {data: "date_requests", title: "Date Requested", className: 'date_requests'},
               {data: "date_needed", title: "Date Needed", className: 'date_needed'},
+              {title: "Priority", className: 'priority_level', sortable : false},
               {title: "Actions", className: 'td_action', sortable : false}
           ]
 
@@ -37,7 +45,13 @@ const main = {
                         return row.tbl_id + ' ' + row.tbl_id;
                     },
                     targets: -1
-                }
+                },
+                {
+                  render: function ( data, type, row ) {
+                      return row.tbl_id + ' ' + row.tbl_id;
+                  },
+                  targets: -2
+              }
             ],
              
               ajax: function (data, callback, settings) {
@@ -93,6 +107,19 @@ const main = {
                   });
 
 
+                   // DISPLAY PRIO WITH TEXT
+                  
+                  let date_needed = moment(data.date_needed, 'YYYY-MM-DD')
+                  let diff = main.fn.calculate_days(date_needed)
+
+                  app.get.priority_status(diff, function(prio){
+                    
+                    $( row ).find('td.priority_level').html(prio)
+
+                  })
+
+
+
                   let url = server_url + '/uploads/'+ data.filename_main
                   console.log({url})
                   let download_link = `<a href="${url}" class="custom_action_icon_btn text-primary" target="_blank"><i class="fa fa-file-text-o"></i></a>`;
@@ -107,13 +134,14 @@ const main = {
       },
     
   },
-  docs_verification: function(approval_id, approver_id, type, d_remarks, disapprove_file, cb){
+  docs_verification: function(approval_id, approver_id, type, d_remarks, disapprove_file, a_remarks, cb){
     const params = {
       _approval_id: approval_id,
       _approver_id: approver_id,
       _type: type,
       _disapprove_remarks: d_remarks,
-      _disapprove_file: disapprove_file
+      _disapprove_file: disapprove_file,
+      _approve_remarks: a_remarks
     };
     console.log({params})
     app.crud.request('sp-update_approval_status', params, function (resp) {
@@ -152,13 +180,19 @@ $(document)
   Swal.fire({
     title:"Are you sure you want to approve this document?",
     html: text,
+    input: 'text',
+    inputPlaceholder: 'Enter Remarks (optional)',
     icon:'question',
     showCancelButton: true,
     confirmButtonText: 'Yes!',
   }).then((result) => {
 
+   
+
+    // console.log({a_remarks})
     if (result.isConfirmed) {
-      main.fn.docs_verification(tbl_id, approver_id, 'a', '', '', function(resp){
+      let a_remarks = result.value.trim()
+      main.fn.docs_verification(tbl_id, approver_id, 'a', '', '', a_remarks, function(resp){
         Swal.fire('Document Approved!', '', 'success')
         $('#for_approval_request_tbl').DataTable().draw(false) // refresh with false = to retain page when draw
       })
@@ -237,7 +271,7 @@ $(document)
 
       app.uploader(file, 'upload_file',function (cb) {
         let file = cb
-        main.fn.docs_verification(tbl_id, approver_id, 'd', reason, file, function(){
+        main.fn.docs_verification(tbl_id, approver_id, 'd', reason, file, '', function(){
           Swal.fire('Document Dispproved!', 'Reason: ' + reason, 'error')
           $('#for_approval_request_tbl').DataTable().draw(false) // refresh with false = to retain page when draw
         })

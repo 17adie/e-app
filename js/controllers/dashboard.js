@@ -149,25 +149,14 @@ const main = {
 
                 
                 // DISPLAY PRIO WITH TEXT
-                let prio;
-
                 let date_needed = moment(data.date_needed, 'YYYY-MM-DD')
                 let diff = main.fn.calculate_days(date_needed)
 
-                if(diff < 3) { // alert when less than 3 days
-                    prio = '<span class="label label-sm label-danger">High</span>';
-                } else if (diff > 2 && diff < 6){ // alert when 3 - 5 days
-                    prio = '<span class="label label-sm label-warning">Medium</span>';
-                } else if (diff > 5) { // alert when greater than 6 days
-                    prio = '<span class="label label-sm label-success">Low</span>';
-                } else {
-                    prio = '<span class="label label-sm label-error">N/A</span>';
-                }
-
-              $( row ).find('td.priority_level').html(prio)
-
+                app.get.priority_status(diff, function(prio){
                 
-                    
+                    $( row ).find('td.priority_level').html(prio)
+
+                })
 
                   $(row).addClass('hover_cls');
 

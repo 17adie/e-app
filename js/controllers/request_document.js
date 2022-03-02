@@ -210,7 +210,7 @@ $(document)
 
       })
 
-      console.log({main_attachment})
+      // console.log({main_attachment})
       // console.log({email_to})
       // console.log({email_cc})
 
