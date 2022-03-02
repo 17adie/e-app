@@ -32,6 +32,148 @@ const main = {
         return diff;
     },
     tbl: {
+        for_my_approval: function() {
+
+            let unfiltered_rows_count;
+        
+            const columns = [
+                {data: "trans_no", title: "TRANS#", className: 'trans_no', sortable : false},
+                {data: "document_title", title: "Subject", className: 'document_title'},
+                {data: "category", title: "Form", className: 'category'},
+                {data: "docs_status", title: "Status", className: 'docs_status'},
+                {data: "requestor", title: "Requestor", className: 'requestor'},
+                {data: "date_needed", title: "Date Needed", className: 'date_needed'},
+                {title: "Priority", className: 'priority_level', sortable : false},
+                {title: "Actions", className: 'td_action', sortable : false}
+                // {data: "date_approved", title: "Date Approved", className: 'date_approved'},
+            ]
+        
+            $('#for_my_approval_tbl').dataTable({
+                serverSide: true,
+                lengthChange: false,
+                searchDelay: 1000,
+                searching: false,
+                processing: true,
+                // stateSave: true, // to save search kahit ilipat sa ibang menu
+                language: {
+                  infoFiltered: "",  // filtered from n total entries datatables remove kasi mali bilang lagi kulang ng isa kapag nag a add.
+                  searchPlaceholder: "Forms, Subject, Requestor"
+              },
+                columns: columns,
+                order: [[ 5, "asc" ]],  
+                columnDefs: [
+                  {
+                      render: function ( data, type, row ) {
+                          return row.tbl_id + ' ' + row.tbl_id;
+                      },
+                      targets: -1
+                  },
+
+                  {
+                    render: function ( data, type, row ) {
+                        return row.tbl_id + ' ' + row.tbl_id;
+                    },
+                    targets: -2
+                }
+              ],
+               
+                ajax: function (data, callback, settings) {
+        
+                    const params = {
+                        _limit_offset: data.start,
+                        _search_string: data.search.value,
+                        _sort_by: data.columns[data.order[0].column].data,
+                        _sort_direction: data.order[0].dir,
+                        _uid: uid
+        
+                    };
+                    app.view_table.request_search('sp-get_all_approval_history', params, function (response) {
+                      
+                        let resp = response.data || [];
+
+                        console.log({resp})
+
+                        resp = resp.filter( v => v.docs_status == 0)
+
+                        console.log({resp})
+                        
+                        if (data.draw === 1) { // if this is the first draw, which means it is unfiltered
+                            unfiltered_rows_count = response._total_count;
+                        }
+        
+                        let total_count = response._total_count;
+        
+                        callback({
+        
+                            draw: data.draw,
+                            data: resp,
+                            recordsTotal: unfiltered_rows_count,
+                            recordsFiltered: total_count
+                        });
+                    });
+                },
+                createdRow: function( row, data, dataIndex ) {
+        
+                    $( row ).find('td:eq(-1)')
+                    .html(`
+                    <div style="display:flex">
+                      <a href="javascript:void(0)" data-target="#modal-view_docs_details" data-toggle="modal" class="custom_action_icon_btn text-warning view_request" data-toggle="tooltip" data-placement="top" title="View" data-original-title="View">
+                        <i class="fa fa-file-text"></i>
+                      </a>
+                    </div>
+                    `
+                    );
+        
+                      $( row ).find('td:eq(-1) > div > a')
+                          .attr({
+                              'data-tbl_id': data.tbl_id,
+                              'data-docs_status': 'Ongoing',
+                              'data-trans_no': data.trans_no,
+                      });
+        
+                  // DISPLAY STATUS WITH TEXT
+                  let stat;
+        
+                  switch(data.docs_status){
+                      case '0':
+                          stat = '<span class="label label-sm gradient-4">Ongoing</span>';
+                          break;
+                      case '1':
+                          stat = '<span class="label label-sm gradient-1">Approved</span>';
+                          break;
+                      case '2':
+                          stat = '<span class="label label-sm gradient-2">Disapproved</span>';
+                          break;
+                      // case '3':
+                      //     stat = '<span class="label label-sm gradient-2">Cancelled</span>';
+                      //     break;
+                      default:
+                          stat = '<span class="label label-sm label-danger">N/A</span>';
+                          break;
+                  }
+        
+                  $( row ).find('td.docs_status')
+                      .html(stat)
+                      .attr({
+                          "data-tbl_id": data.tbl_id
+                      });
+
+                    // DISPLAY PRIO WITH TEXT
+                    let date_needed = moment(data.date_needed, 'YYYY-MM-DD')
+                    let diff = main.fn.calculate_days(date_needed)
+
+                    app.get.priority_status(diff, function(prio){
+                    
+                        $( row ).find('td.priority_level').html(prio)
+
+                    })
+                        
+                    $(row).addClass('hover_cls');
+        
+                }
+        
+            });
+        },
 
       // DATATABLES
       my_request: function() {
@@ -127,6 +269,7 @@ const main = {
                           'data-tbl_id': data.tbl_id,
                           'data-document_title': data.document_title,
                           'data-trans_no': data.trans_no,
+                          'data-docs_status' : 'For Approval'
                   });
 
                   // DISPLAY STATUS WITH TEXT
@@ -171,6 +314,7 @@ const main = {
 main.fn.get_holiday()
 app.get.dashboard_count(uid, function(resp) {
   main.fn.tbl.my_request()
+  main.fn.tbl.for_my_approval()
 
   let d = resp = undefined ? '' : resp[0]
 
@@ -185,7 +329,7 @@ app.get.dashboard_count(uid, function(resp) {
 $(document)
 
 .off('click','.view_request').on('click','.view_request', function(){
-    let { tbl_id } = $(this).data()
+    let { tbl_id, docs_status } = $(this).data()
     app.loader('show', '#modal-view_docs_details .modal-body');
     app.get.notif_details(tbl_id, function(resp){
         let d = resp[0]
@@ -221,7 +365,7 @@ $(document)
     
         let date_needed = moment(d.date_needed, 'YYYY-MM-DD')
 
-        $('.txt_document_status').html('For Approval')
+        $('.txt_document_status').html(docs_status)
         $('.txt_trans_no').html(d.trans_no)
         $('.txt_category').html(d.category)
         $('.txt_requestor').html(d.requestor)
