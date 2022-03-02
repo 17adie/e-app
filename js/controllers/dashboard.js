@@ -4,6 +4,59 @@ let uid = app.cookie.get('uid');
 
 const main = {
   fn: {
+    chart : {
+        request_summary: function(){
+            //pie chart
+
+            const params = {
+                _uid: uid,
+              };
+              app.crud.request('sp-get_form_summary_count', params, function (resp) {
+
+                let form_count = resp.map(v => v.f_count)
+                let form_name = resp.map(v => v.form)
+
+                console.log({resp})
+                console.log({form_count})
+                console.log({form_name})
+
+                let ctx = document.getElementById("form_summary");
+                ctx.height = 150;
+                let myChart = new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        datasets: [{
+                            data: form_count,
+                            backgroundColor: [
+                                "#03254c",
+                                "#1167b1",
+                                "#187bcd",
+                                "#2a9df4",
+                                "#d0efff"
+                            ],
+                            hoverBackgroundColor: [
+                                "#03254c",
+                                "#1167b1",
+                                "#187bcd",
+                                "#2a9df4",
+                                "#d0efff"
+                            ]
+
+                        }],
+                        labels: form_name
+                    },
+                    options: {
+                        responsive: true
+                    }
+                });
+
+                return
+              })
+
+
+            
+        },
+    },
     get_holiday: function(){
         app.get_list.request('sp-get_holiday', function (resp) {
   
@@ -91,11 +144,11 @@ const main = {
                       
                         let resp = response.data || [];
 
-                        console.log({resp})
+                        // console.log({resp})
 
                         resp = resp.filter( v => v.docs_status == 0)
 
-                        console.log({resp})
+                        // console.log({resp})
                         
                         if (data.draw === 1) { // if this is the first draw, which means it is unfiltered
                             unfiltered_rows_count = response._total_count;
@@ -194,6 +247,7 @@ const main = {
               lengthChange: false,
               searching: false,
               processing: true,
+            //   scrollY: '44vh',
               language: {
                   infoFiltered: "", 
               },
@@ -232,7 +286,7 @@ const main = {
                   app.view_table.request('sp-get_document_request', params, function (response) {
                     
                       let resp = response.data || [];
-                    console.log(resp)
+                    // console.log(resp)
                      
                       if (data.draw === 1) { // if this is the first draw, which means it is unfiltered
                           unfiltered_rows_count = response._total_count;
@@ -315,6 +369,7 @@ main.fn.get_holiday()
 app.get.dashboard_count(uid, function(resp) {
   main.fn.tbl.my_request()
   main.fn.tbl.for_my_approval()
+  main.fn.chart.request_summary()
 
   let d = resp = undefined ? '' : resp[0]
 
@@ -324,6 +379,9 @@ app.get.dashboard_count(uid, function(resp) {
   $('.my_document_request_count').html(d.for_approvals_count)
 
 })
+
+
+
 
 
 $(document)
