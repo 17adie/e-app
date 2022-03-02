@@ -135,16 +135,20 @@ const app = {
         },
         check_session: function() {
             let uid = app.cookie.get("uid")
-            if(uid ==  '' || uid === undefined) {
+            // to restrict admin to go to user page
+            if(uid ==  '' || uid === undefined || uid == 1) {
                 window.location.href = '../index.html';
                 return
             }
 
-            if(uid == 1) {
-                window.location.href = 'admin_page.html';
+        },
+        check_admin_session: function(){
+            let uid = app.cookie.get("uid")
+            // to restrict user to go to admin page
+            if(uid ==  '' || uid === undefined || uid > 1) {
+                window.location.href = '../index.html';
                 return
             }
-
         },
         l_encr: function(str, callback){
 
@@ -325,19 +329,24 @@ $(document).ready(function() {
     let _uid = app.cookie.get("uid");
 
    if(_uid) {
-        app.get.dashboard_count(_uid, function(resp){
-            let d = resp = undefined ? '' : resp[0]
-           
-            if(d.user_notificiation_count == 0) {
-                $('.my_notification_count_nav').removeClass('badge-pill gradient-2')
-            }
-
-            $('.my_notification_count_nav').html(d.user_notificiation_count == 0 ? '' : d.user_notificiation_count)
-            app.get.user_details(_uid, function(resp){
-                let ud = resp = undefined ? '' : resp[0]
-                $('.user_fullname').html(`Hi, ${ud.first_name} ${ud.last_name}`)
+        if(_uid == 1) {
+            console.log('admin')
+            return
+        } else {
+            app.get.dashboard_count(_uid, function(resp){
+                let d = resp = undefined ? '' : resp[0]
+               
+                if(d.user_notificiation_count == 0) {
+                    $('.my_notification_count_nav').removeClass('badge-pill gradient-2')
+                }
+    
+                $('.my_notification_count_nav').html(d.user_notificiation_count == 0 ? '' : d.user_notificiation_count)
+                app.get.user_details(_uid, function(resp){
+                    let ud = resp = undefined ? '' : resp[0]
+                    $('.user_fullname').html(`Hi, ${ud.first_name} ${ud.last_name}`)
+                })
             })
-        })
+        }
    } else {
        console.log('please login')
    }
