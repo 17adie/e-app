@@ -27,13 +27,17 @@ $(document)
    main.get.login_details(username, function(resp){
    
   let d = resp = undefined ? '' : resp[0]
- 
+    console.log([d])
   if(d) {
     app.log.l_auth(password, d.password, function (auth_resp) {
      
      if(auth_resp == 1) {
       app.cookie.set('uid', d.tbl_id, function(){
-        window.location.href = 'views/dashboard.html';
+        if(d.tbl_id == 1) {
+          window.location.href = 'views/admin_page.html';
+        } else {
+          window.location.href = 'views/dashboard.html';
+        }
       })
       
      } else{

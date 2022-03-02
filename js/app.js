@@ -123,6 +123,12 @@ const app = {
         },
         check_login_session: function(){
             let uid = app.cookie.get("uid")
+
+            if(uid == 1) {
+                window.location.href = 'views/admin_page.html';
+                return
+            }
+
             if(uid) {
                 window.location.href = 'views/dashboard.html';
             }
@@ -131,7 +137,14 @@ const app = {
             let uid = app.cookie.get("uid")
             if(uid ==  '' || uid === undefined) {
                 window.location.href = '../index.html';
+                return
             }
+
+            if(uid == 1) {
+                window.location.href = 'admin_page.html';
+                return
+            }
+
         },
         l_encr: function(str, callback){
 
