@@ -14776,3 +14776,13 @@ div.custom-list-group {
 div.custom-list-group ul.list-group > li.list-group-item {
   padding: 0.2rem 1.1rem !important;
 }
+
+div.no-data-yet {
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+div.no-data-yet i {
+  font-size: 10rem;
+  color: #eee;
+}

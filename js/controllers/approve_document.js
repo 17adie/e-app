@@ -121,7 +121,7 @@ const main = {
 
 
                   let url = server_url + '/uploads/'+ data.filename_main
-                  console.log({url})
+                  // console.log({url})
                   let download_link = `<a href="${url}" class="custom_action_icon_btn text-primary" target="_blank"><i class="fa fa-file-text-o"></i></a>`;
 
                   $( row ).find('td.filename_main').html(download_link)
@@ -143,7 +143,7 @@ const main = {
       _disapprove_file: disapprove_file,
       _approve_remarks: a_remarks
     };
-    console.log({params})
+    // console.log({params})
     app.crud.request('sp-update_approval_status', params, function (resp) {
       return cb(resp)
     })
@@ -263,7 +263,7 @@ $(document)
     }
   }).then((result) => {
 
-    console.log({result})
+    // console.log({result})
     if (result.isConfirmed) {
       
       let reason = result.value.reason

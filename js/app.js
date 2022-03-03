@@ -340,10 +340,10 @@ $(document).ready(function() {
                     $('.my_notification_count_nav').removeClass('badge-pill gradient-2')
                 }
     
-                $('.my_notification_count_nav').html(d.user_notificiation_count == 0 ? '' : d.user_notificiation_count)
                 app.get.user_details(_uid, function(resp){
                     let ud = resp = undefined ? '' : resp[0]
                     $('.user_fullname').html(`Hi, ${ud.first_name} ${ud.last_name}`)
+                    $('.my_notification_count_nav').html(d.user_notificiation_count == 0 ? '' : d.user_notificiation_count)
                 })
             })
         }

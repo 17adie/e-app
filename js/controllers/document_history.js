@@ -17,6 +17,7 @@ const main = {
               {data: "docs_status", title: "Document Status", className: 'docs_status'},
               {data: "requestor", title: "Requestor", className: 'requestor'},
               {data: "date_request", title: "Date Requested", className: 'date_request'},
+              {title: "Actions", className: 'td_actions' , sortable : false},
             //   {data: "date_approved", title: "Date Approved", className: 'date_approved'},
           ]
 
@@ -36,9 +37,9 @@ const main = {
               columnDefs: [
                 {
                     render: function ( data, type, row ) {
-                        return row.tbl_id + ' ' + row.tbl_id;
+                        return row.tbl_id;
                     },
-                    // targets: -1
+                    targets: -1
                 }
             ],
              
@@ -113,6 +114,16 @@ const main = {
                   <span></span>
                   </a>`
                   )
+
+                  $( row ).find('td:eq(-1)')
+                    .html(`
+                    <div style="display:flex">
+                      <a href="javascript:void(0)" class="custom_action_icon_btn process_document text-success" data-docs_status="${data.docs_status}" data-tbl_id="${data.tbl_id}"  data-trans_no="${data.trans_no}" data-toggle="tooltip" data-placement="top" title="Process" data-original-title="Process">
+                        <i class="fa fa-send"></i>
+                      </a>
+                    </div>
+                    `
+                    );
                       
                   $(row).addClass('hover_cls');
 
@@ -681,6 +692,24 @@ $(document)
     })
 
 })
+
+.off('click', '.process_document').on('click', '.process_document', function(){
+  let {tbl_id , docs_status, trans_no} = $(this).data()
+
+  // console.log({trans_no})
+  // console.log({tbl_id})
+  // console.log({docs_status})
+
+  if(docs_status == 0) {
+    Swal.fire('Unable to Process!', 'This document is for approval.', 'error')
+    return
+  }
+
+  
+
+
+})
+
 
 
 

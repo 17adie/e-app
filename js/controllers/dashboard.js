@@ -13,47 +13,54 @@ const main = {
               };
               app.crud.request('sp-get_form_summary_count', params, function (resp) {
 
-                let form_count = resp.map(v => v.f_count)
-                let form_name = resp.map(v => v.form)
+                
 
-                console.log({resp})
-                console.log({form_count})
-                console.log({form_name})
+                if(resp.length != 0){
+                    
+                    let form_count = resp.map(v => v.f_count)
+                    let form_name = resp.map(v => v.form)
+    
+                    console.log({resp})
+                    console.log({form_count})
+                    console.log({form_name})
+    
+                    let ctx = document.getElementById("form_summary");
+                    ctx.height = 150;
+                    let myChart = new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            datasets: [{
+                                data: form_count,
+                                backgroundColor: [
+                                    "#03254c",
+                                    "#1167b1",
+                                    "#187bcd",
+                                    "#2a9df4",
+                                    "#d0efff"
+                                ],
+                                hoverBackgroundColor: [
+                                    "#03254c",
+                                    "#1167b1",
+                                    "#187bcd",
+                                    "#2a9df4",
+                                    "#d0efff"
+                                ]
+    
+                            }],
+                            labels: form_name
+                        },
+                        options: {
+                            responsive: true
+                        }
+                    });
+                    return
+                } else {
+                    $('#form_summary').hide()
+                    $('.no-data-yet').html(`<i class="fa fa-pie-chart"></i>
+                                            <div>No Data Yet.</div>`)
+                }
 
-                let ctx = document.getElementById("form_summary");
-                ctx.height = 150;
-                let myChart = new Chart(ctx, {
-                    type: 'pie',
-                    data: {
-                        datasets: [{
-                            data: form_count,
-                            backgroundColor: [
-                                "#03254c",
-                                "#1167b1",
-                                "#187bcd",
-                                "#2a9df4",
-                                "#d0efff"
-                            ],
-                            hoverBackgroundColor: [
-                                "#03254c",
-                                "#1167b1",
-                                "#187bcd",
-                                "#2a9df4",
-                                "#d0efff"
-                            ]
-
-                        }],
-                        labels: form_name
-                    },
-                    options: {
-                        responsive: true
-                    }
-                });
-
-                return
               })
-
-
             
         },
     },
