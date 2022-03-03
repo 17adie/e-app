@@ -146,23 +146,25 @@ const main = {
         })
       },
     },
-    email_notification: function(subject, message, to, cc, trans_no, date_needed, cb){
-      $.ajax({
-        url:server_url + '/ajax/email_notification.php',
-        type:'post',
-        data:{
-            subject: subject,
-            message: message,
-            to: to,
-            cc: cc,
-            trans_no: trans_no,
-            date_needed: date_needed,
-            requestor: requestor,
-        },
-        success:function(resp){
-            return cb(resp);
-        }
-    });
+    email_notification: function(data, cb){
+
+      // console.log('data.email_to', data.email_to.length)
+      if(data.email_to.length != 0) { // check if have email
+
+        $.ajax({
+          url:server_url + '/ajax/' + data.file_name + '.php',
+          type:'post',
+          data: {data},
+          cache: false,
+          success:function(resp){
+              return cb(resp);
+          }
+        });
+
+      } else {
+        return cb('no email')
+      }
+
     },
   }  
 }
@@ -194,6 +196,11 @@ $(document)
       form = $('#form_form').val(),
       expected_days = $('#expected_days').val();
       // prio_lvl =  $('#prio_lvl').val();
+
+      // form_name = document.querySelector('#form_form option:checked').textContent
+      form_name = $("#form_form option:selected").text().trim();
+
+      // console.log(form_name)
 
       let email_to = []
       let email_cc = []
@@ -233,31 +240,48 @@ $(document)
 
                 console.log({approval_id})
                
-                 main.fn.email_notification(doc_title, req_message, email_to, email_cc, trans_no, date_needed, function(resp){
-                  console.log({resp})
+                 main.fn.email_notification({ // notification for approver
+                    doc_title : doc_title, 
+                    req_message : req_message, 
+                    email_to : email_to, 
+                    trans_no : trans_no, 
+                    date_needed : date_needed, 
+                    form_name : form_name, 
+                    requestor : requestor, 
+                    file_name: 'email_notification_approver'}, function(resp){
+                      console.log('approver ', {resp})
 
-                  multiple_approver.forEach((element) => { 
-                    main.fn.add.approver(approval_id, element, function(){
-                      console.log('approver')
+                      main.fn.email_notification({ // notification for notifed person
+                        doc_title : doc_title,  
+                        requestor : requestor, 
+                        email_to : email_cc, 
+                        file_name: 'email_notificaiton_np'}, function(resp){
+
+                      console.log('NP', {resp})
+
+                    multiple_approver.forEach((element) => { 
+                      main.fn.add.approver(approval_id, element, function(){
+                        console.log('approver')
+                      })
                     })
-                   })
-                  
-                   multiple_notification.forEach((element) => { 
-                    main.fn.add.notification(approval_id, element, function(){
-                      console.log('notification')
-                      
+                    
+                    multiple_notification.forEach((element) => { 
+                      main.fn.add.notification(approval_id, element, function(){
+                        console.log('notification')
+                        
+                      })
                     })
-                   })
-  
-                Ladda.stopAll()
+    
+                  Ladda.stopAll()
 
-                 $('input, type, select').val('')
-                 $(".select-multiple-approver").val([]).change();
-                 $(".select-multiple-notification").val([]).change();
+                  $('input, type, select').val('')
+                  $(".select-multiple-approver").val([]).change();
+                  $(".select-multiple-notification").val([]).change();
 
-                 swal('Success', 'Document has been successfully submitted', 'success')
+                  swal('Success', 'Document has been successfully submitted', 'success')
                   
-                })
+                  }) // end NP notif
+                }) // end approver notif
 
               })
           })
