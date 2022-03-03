@@ -35,23 +35,19 @@ if(isset($_POST['subject']) && isset($_POST['message']) && isset($_POST['to'])){
     //Server settings
     $mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
     $mail->isSMTP();                                            //Send using SMTP
-    $mail->Host       = 'smtp.gmail.com';                     //Set the SMTP server to send through
+    $mail->Host       = E_HOST;                     //Set the SMTP server to send through
     $mail->SMTPAuth   = true;                                   //Enable SMTP authentication
     $mail->Username   = EMAIL;                     //SMTP username
     $mail->Password   = PASS;                               //SMTP password
     $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;            //Enable implicit TLS encryption
-    $mail->Port       = 465;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+    $mail->Port       = E_PORT;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
 
     $mail->isHTML(true);                                  //Set email format to HTML
     $mail->setFrom(EMAIL, 'E-APP NOTIFICATION');
     $mail->Subject = $subject;
     $mail->Body    = $mes;
 
-    // $mail->addAttachment('uploads/'. $main_atch, 'Main Document');
-    // if($sup_atch) {
-    //   $mail->addAttachment('uploads/'. $sup_atch, 'Supporting Document');
-    // }
-
+    
     foreach($tos as $to){
       $mail->addAddress($to);              // Add a recipient
     }
