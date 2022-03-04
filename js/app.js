@@ -131,8 +131,9 @@ const app = {
     },
 
     cookie: {
-        set: function(cname, cvalue, cb){
-            document.cookie = cname + "=" + cvalue + ";path=/";
+        set: function(id, type, cb){
+            document.cookie = 'uid' + "=" + id + ";path=/";
+            document.cookie = 'utype' + "=" + type + ";path=/";
             return cb()
         },
         get: function(cname){
@@ -154,6 +155,7 @@ const app = {
     log: {
         logout: function(){
             document.cookie = "uid=;expires = Thu, 01 Jan 1970 00:00:00 GMT;path=/"
+            document.cookie = "utype=;expires = Thu, 01 Jan 1970 00:00:00 GMT;path=/"
             window.location.href = '../index.html';
         },
         check_login_session: function(){

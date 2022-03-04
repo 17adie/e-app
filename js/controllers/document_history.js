@@ -580,10 +580,19 @@ const main = {
       return cb(resp)
     })
   },
+  check_user_type: function(){
+    let _utype = app.cookie.get("utype");
+
+    if(_utype == 'user_np') {
+      // console.log({_utype})
+      $('.show_if_np').removeAttr('hidden')
+    }
+
+  },
 }
 }
 
-
+main.fn.check_user_type()
 main.fn.tbl.notification()
 main.fn.tbl.cancelled()
 main.fn.tbl.request()

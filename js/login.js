@@ -22,18 +22,19 @@ $(document)
  let password = $('#password').val() 
 
  if(!username || !password){
-  swal("Invalid","Invalid username or password","error")
+  // swal("Invalid","Invalid username or password","error")
+  Toast.fire({ icon: 'error', title: 'Invalid username or password.'})
  } else {
    main.get.login_details(username, function(resp){
    
   let d = resp = undefined ? '' : resp[0]
-    console.log([d])
+    // console.log({d})
   if(d) {
     app.log.l_auth(password, d.password, function (auth_resp) {
      
      if(auth_resp == 1) {
-      app.cookie.set('uid', d.tbl_id, function(){
-        if(d.tbl_id == 1) {
+      app.cookie.set(d.tbl_id, d.type, function(){
+        if(d.type == 'admin') {
           window.location.href = 'views/admin_page.html';
         } else {
           window.location.href = 'views/dashboard.html';
@@ -41,11 +42,13 @@ $(document)
       })
       
      } else{
-      swal("Invalid","Invalid username or password","error")
+      // swal("Invalid","Invalid username or password","error")
+      Toast.fire({ icon: 'error', title: 'Invalid username or password.'})
      }
    })
   } else {
-    swal("Invalid","Invalid username or password","error")
+    // swal("Invalid","Invalid username or password","error")
+    Toast.fire({ icon: 'error', title: 'Invalid username or password.'})
   }
 
    
