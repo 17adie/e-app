@@ -77,7 +77,8 @@ const main = {
               // window.location.href= server_url + '/forms/'+ url.url
               
             } else {
-              swal('Invalid Input','Please select value from Category and Form', 'error')
+              // swal('Invalid Input','Please select value from Category and Form', 'error')
+              Toast.fire({ icon: 'error', title: 'Please select value from Category and Form'})
             }
 
 
@@ -146,26 +147,26 @@ const main = {
         })
       },
     },
-    email_notification: function(data, cb){
+    // email_notification: function(data, cb){
 
-      // console.log('data.email_to', data.email_to.length)
-      if(data.email_to.length != 0) { // check if have email
+    //   // console.log('data.email_to', data.email_to.length)
+    //   if(data.email_to.length != 0) { // check if have email
 
-        $.ajax({
-          url:server_url + '/ajax/' + data.file_name + '.php',
-          type:'post',
-          data: {data},
-          cache: false,
-          success:function(resp){
-              return cb(resp);
-          }
-        });
+    //     $.ajax({
+    //       url:server_url + '/ajax/' + data.file_name + '.php',
+    //       type:'post',
+    //       data: {data},
+    //       cache: false,
+    //       success:function(resp){
+    //           return cb(resp);
+    //       }
+    //     });
 
-      } else {
-        return cb('no email')
-      }
+    //   } else {
+    //     return cb('no email')
+    //   }
 
-    },
+    // },
   }  
 }
 
@@ -222,13 +223,16 @@ $(document)
       // console.log({email_cc})
 
       if((!doc_title || !req_message || !date_needed) || !form || multiple_approver.length == 0 || !expected_days || !main_attachment.val()) {
-        swal('Invalid', 'Please fill in all the required fields.', 'warning')
+        // swal('Invalid', 'Please fill in all the required fields.', 'warning')
+        Toast.fire({ icon: 'error', title: 'Please fill in all the required fields.'})
         Ladda.stopAll()
       } else if(form === 'prf' && !support_attachment.val()) { // required supporting document
-        swal('Invalid', 'Please attach Supporting Document', 'warning')
+        // swal('Invalid', 'Please attach Supporting Document', 'warning')
+        Toast.fire({ icon: 'error', title: 'Please attach Supporting Document'})
         Ladda.stopAll()
       } else if (expected_days < 3){
-        swal('Invalid', 'Expected days should be greater than or equal to 3 working days', 'warning')
+        // swal('Invalid', 'Expected days should be greater than or equal to 3 working days', 'warning')
+        Toast.fire({ icon: 'error', title: 'Expected days should be greater than or equal to 3 working days'})
         Ladda.stopAll()
       } else {
         app.uploader(main_attachment, 'upload_file',function (cb) {
@@ -240,7 +244,7 @@ $(document)
 
                 console.log({approval_id})
                
-                 main.fn.email_notification({ // notification for approver
+                 app.email_notification({ // notification for approver
                     doc_title : doc_title, 
                     req_message : req_message, 
                     email_to : email_to, 
@@ -251,7 +255,7 @@ $(document)
                     file_name: 'email_notification_approver'}, function(resp){
                       console.log('approver ', {resp})
 
-                      main.fn.email_notification({ // notification for notifed person
+                      app.email_notification({ // notification for notifed person
                         doc_title : doc_title,  
                         requestor : requestor, 
                         email_to : email_cc, 
@@ -278,7 +282,9 @@ $(document)
                   $(".select-multiple-approver").val([]).change();
                   $(".select-multiple-notification").val([]).change();
 
-                  swal('Success', 'Document has been successfully submitted', 'success')
+                  // swal('Success', 'Document has been successfully submitted', 'success')
+                  Toast.fire({ icon: 'success', title: 'Document has been successfully submitted!'})
+
                   
                   }) // end NP notif
                 }) // end approver notif
@@ -300,7 +306,9 @@ $(document)
   if(is_holiday) {
     $('#date_needed').val('')
     $('#expected_days').val('');
-    swal('This is holiday', '', 'error')
+    // swal('This is holiday', '', 'error')
+    Toast.fire({ icon: 'error', title: 'Selected date is holiday!'})
+    
     return
   }
 

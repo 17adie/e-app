@@ -1,6 +1,7 @@
 app.log.check_session()
 
 let uid = app.cookie.get('uid');
+let issued_by;
 
 const main = {
   fn: {
@@ -14,7 +15,7 @@ const main = {
               {data: "read_status", title: "", className: 'read_status'},
               {data: "trans_no", title: "TRANS#", className: 'trans_no', sortable : false},
               {data: "category", title: "Form", className: 'category'},
-              {data: "docs_status", title: "Document Status", className: 'docs_status'},
+              {data: "docs_status", title: "Document Status", className: 'docs_status', sortable : false},
               {data: "requestor", title: "Requestor", className: 'requestor'},
               {data: "date_request", title: "Date Requested", className: 'date_request'},
               {title: "Actions", className: 'td_actions' , sortable : false},
@@ -116,14 +117,14 @@ const main = {
                   )
 
                   $( row ).find('td:eq(-1)')
-                    .html(`
-                    <div style="display:flex">
-                      <a href="javascript:void(0)" class="custom_action_icon_btn process_document text-success" data-docs_status="${data.docs_status}" data-tbl_id="${data.tbl_id}"  data-trans_no="${data.trans_no}" data-toggle="tooltip" data-placement="top" title="Process" data-original-title="Process">
-                        <i class="fa fa-send"></i>
-                      </a>
-                    </div>
-                    `
-                    );
+                  .html(data.docs_status == 1 ?` 
+                  <a href="javascript:void(0)" class="custom_action_icon_btn process_document text-success" data-form="${data.form}" data-document_title="${data.document_title}" data-email="${data.email}" data-requestor="${data.requestor}" data-docs_status="${data.docs_status}" data-tbl_id="${data.tbl_id}"  data-trans_no="${data.trans_no}" data-toggle="tooltip" data-placement="top" title="Process" data-original-title="Process">
+                    <i class="fa fa-send"></i>
+                  </a>` : 
+                  `<div href="javascript:void(0)" class="custom_action_icon_btn text-muted">
+                    <i class="fa fa-send"></i>
+                  </div>`
+                  )
                       
                   $(row).addClass('hover_cls');
 
@@ -559,8 +560,26 @@ const main = {
 
         return cb(resp)
     });
-  }
-    
+  },
+  get_process_tag: function(tbl_id, cb) {
+    const params = {
+      _tbl_id: tbl_id,
+      _uid: uid
+    };
+    app.crud.request('sp-get_process_tagging', params, function (resp) {
+      return cb(resp)
+    })
+  },
+  update_process_document: function(tbl_id, process_remarks, cb) {
+    const params = {
+      _tbl_id: tbl_id,
+      _uid: uid,
+      _process_remarks: process_remarks
+    };
+    app.crud.request('sp-update_process_document', params, function (resp) {
+      return cb(resp)
+    })
+  },
 }
 }
 
@@ -569,6 +588,10 @@ main.fn.tbl.notification()
 main.fn.tbl.cancelled()
 main.fn.tbl.request()
 main.fn.tbl.approval()
+app.get.user_details(uid, function(resp){
+  let ud = resp = undefined ? '' : resp[0]
+    issued_by = ud.last_name + ', ' + ud.first_name;
+})
 
 $('#modal-view_notif_details').on('hidden.bs.modal', function () {
     $(this).find("div.col-7").html('').end()
@@ -694,19 +717,67 @@ $(document)
 })
 
 .off('click', '.process_document').on('click', '.process_document', function(){
-  let {tbl_id , docs_status, trans_no} = $(this).data()
+  let {tbl_id , docs_status, trans_no, requestor, email, document_title, form} = $(this).data()
+  let email_to = email.split() // convert to array for global notification
+  let text = `<small>Trans #: </small> ${trans_no} <br> <small>Requestor: </small> ${requestor}`
 
-  // console.log({trans_no})
-  // console.log({tbl_id})
+  console.log({email})
+  console.log({trans_no})
+  console.log({tbl_id})
   // console.log({docs_status})
+  // console.log({email_to})
 
-  if(docs_status == 0) {
-    Swal.fire('Unable to Process!', 'This document is for approval.', 'error')
-    return
-  }
+  main.fn.get_process_tag(tbl_id, function(resp){
+    let ptag = resp[0].process_tag
+    // console.log({ptag})
 
+    if(ptag) {
+      // Swal.fire('Invalid!', 'Document already sent a notification', 'error')
+      Toast.fire({ icon: 'warning', title: 'Document already sent a notification.'})
+      return
+    }
+
+    Swal.fire({
+      title:"Are you sure you want to process this document?",
+      html: text,
+      input: 'text',
+      inputPlaceholder: 'Enter Remarks (optional)',
+      icon:'question',
+      showCancelButton: true,
+      confirmButtonText: 'Yes!',
+      showLoaderOnConfirm: true,
+      allowEscapeKey: false,
+      allowOutsideClick: false,
+      preConfirm: (process_remarks) => {
+      console.log(process_remarks)
+     
+        return new Promise((resolve, reject) => { // for sweetalert loader ..
+            main.fn.update_process_document(tbl_id, process_remarks, function(resp){
+              app.email_notification({ // notification for notifed person
+                doc_title : document_title,  
+                issued_by: issued_by,
+                email_to : email_to, 
+                trans_no : trans_no,
+                form_name : form,
+                process_remarks: process_remarks == '' ? 'N/A' : process_remarks,
+                file_name: 'email_notification_process'}, function(resp){
+                console.log('pre pros', {resp})
+                return resolve(resp)
+              })
+              
+            })
+    
+        }).catch(err => { console.log(err) });
+         
+      },
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Toast.fire({ icon: 'success', title: 'Document notification sent successfully' })
+      }
   
-
+    })
+    
+  })
 
 })
 

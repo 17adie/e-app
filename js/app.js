@@ -1,7 +1,42 @@
 
 let server_url = 'http://localhost/e-app';
 
+let Toast = Swal.mixin({
+    toast: true,
+    position: 'top-right',
+    iconColor: 'white',
+    customClass: {
+      popup: 'colored-toast'
+    },
+    showConfirmButton: false,
+    timer: 4000,
+    timerProgressBar: true
+  });
+
 const app = {
+
+    email_notification: function(data, cb){
+
+        // console.log('data.email_to', data.email_to.length)
+        if(data.email_to.length != 0) { // check if have email
+  
+          $.ajax({
+            url:server_url + '/ajax/' + data.file_name + '.php',
+            type:'post',
+            data: {data},
+            async: false,
+            cache: false,
+            success:function(resp){
+
+                return cb(resp);
+            }
+          });
+  
+        } else {
+          return cb('no email')
+        }
+  
+    },
 
     // modal body loader
     loader: function(method, elem){

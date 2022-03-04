@@ -458,22 +458,39 @@ $(document)
 
     let text = `Trans#: ${trans_no} \n Document: ${document_title}`
 
-    swal({
+    // swal({
+    //     title:"Are you sure you want to cancel?",
+    //     text: text,
+    //     type:"info",
+    //     showCancelButton:!0,
+    //     confirmButtonColor:"#DD6B55",
+    //     confirmButtonText:"Yes",
+    //     closeOnConfirm:!1
+    // },function(){
+        
+    //     main.fn.cancel_document(tbl_id, function(resp){
+    //         swal('Document Cancelled!','','success');
+    //         $('#request_tbl').DataTable().draw(false) // refresh with false = to retain page when draw
+    //     })
+        
+    // })
+
+    Swal.fire({
         title:"Are you sure you want to cancel?",
-        text: text,
-        type:"info",
-        showCancelButton:!0,
-        confirmButtonColor:"#DD6B55",
-        confirmButtonText:"Yes",
-        closeOnConfirm:!1
-    },function(){
-        
-        main.fn.cancel_document(tbl_id, function(resp){
-            swal('Document Cancelled!','','success');
-            $('#request_tbl').DataTable().draw(false) // refresh with false = to retain page when draw
-        })
-        
-    })
+        html: text,
+        icon:'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes!',
+      }).then((result) => {
+    
+        if (result.isConfirmed) {
+            main.fn.cancel_document(tbl_id, function(resp){
+                Toast.fire({ icon: 'success', title: 'Document Cancelled!'})
+                $('#request_tbl').DataTable().draw(false) // refresh with false = to retain page when draw
+            })
+        }
+    
+      })
  
 
 })

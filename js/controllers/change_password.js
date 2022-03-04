@@ -32,13 +32,15 @@ $(document)
       new_pw = $('#new_pw').val().trim();
 
   if(!old_pw || !new_pw) {
-    swal('Invalid', 'Please fill in all the required fields.', 'warning')
+    // swal('Invalid', 'Please fill in all the required fields.', 'warning')
+    Toast.fire({ icon: 'error', title: 'Please fill in all the required fields.'})
     Ladda.stopAll()
     return
   }
 
   if(new_pw.length < 6) {
-    swal('Invalid', 'Password must be at least 6 characters long', 'warning')
+    // swal('Invalid', 'Password must be at least 6 characters long', 'warning')
+    Toast.fire({ icon: 'error', title: 'Password must be at least 6 characters long.'})
     Ladda.stopAll()
     return
   }
@@ -49,7 +51,8 @@ $(document)
     app.log.l_auth(old_pw, ud.password , function (auth_resp) {
       console.log({auth_resp})
       if (auth_resp == 0) {
-        swal('Invalid', 'Old password does not match', 'warning')
+        // swal('Invalid', 'Old password does not match', 'warning')
+        Toast.fire({ icon: 'error', title: 'Old password does not match.'})
         Ladda.stopAll()
         return
       }
@@ -61,7 +64,9 @@ $(document)
           $('#old_pw').val('')
           $('#new_pw').val('')
           Ladda.stopAll()
-          swal('Password Changed', 'Password has been successfully changed', 'success')
+          // swal('Password Changed', 'Password has been successfully changed', 'success')
+          Toast.fire({ icon: 'success', title: 'Password has been successfully changed.'})
+
         })
       
       })

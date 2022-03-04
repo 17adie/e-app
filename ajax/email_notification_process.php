@@ -25,25 +25,24 @@ if( isset($_POST['data']) ) {
   date_default_timezone_set('Asia/Manila');
 
   $data = $_POST['data'];
+
   $subject = $data['doc_title'];
-  $message = $data['req_message'];
+  $issued_by = $data['issued_by'];
   $tos = $data['email_to'];
   $trans_no = $data['trans_no'];
-  $date_needed = $data['date_needed'];
-  $requestor = $data['requestor'];
-  $eapp_page = '<a href="'. E_WEB .'" target="_blank">E-Approvals</a>';
-  $date_request = date("Y-m-d h:i:sa");
   $form = $data['form_name'];
+  $process_remarks = $data['process_remarks'];
 
+  $eapp_page = '<a href="'. E_WEB .'" target="_blank">E-Approvals</a>';
+  $date_today = date("Y-m-d h:i:sa");
+  
   $mes = "Greetings! <br><br>" .
-         "Please be informed that an E-Approval document awaits your approval. <br><br>" . 
-         "Trans No.: <strong>" . $trans_no . "</strong><br>" . 
-         "Requestor: <strong>" . $requestor . "</strong><br>" . 
-         "Form: <strong>" . $form . "</strong><br>" . 
-         "Document Title: <strong>" . $subject . "</strong><br>" . 
-         "Message: <strong>" . $message . "</strong><br>" . 
-         "Date Needed: <strong>" . $date_needed . "</strong><br>" . 
-         "Date Requested: <strong>" . $date_request . "</strong><br><br><br>" . 
+         "There has been an update with regards to the proccessing of your document request. <br><br>" . 
+         "Issued by: <strong>" . $issued_by . "</strong><br>" . 
+         "Document Transaction ID: <strong>" . $trans_no . "</strong><br>" . 
+         "Document: <strong>" . $form . "</strong><br>" . 
+         "Remarks: <strong>" . $process_remarks . "</strong><br>" . 
+         "Date: <strong>" . $date_today . "</strong><br><br><br>" . 
          "To proceed with the transaction, please go to: " . $eapp_page . " page. <br><br><br>" .
          "This is a system-generated email, please do not reply."
          ;
@@ -61,7 +60,7 @@ if( isset($_POST['data']) ) {
 
     $mail->isHTML(true);                                  //Set email format to HTML
     $mail->setFrom(EMAIL, 'E-APP NOTIFICATION');
-    $mail->Subject = "E-Approval Pending Document: " . $subject;
+    $mail->Subject = "E-Approval Document Processing Update: " . $subject;
     $mail->Body    = $mes;
 
     
@@ -71,7 +70,8 @@ if( isset($_POST['data']) ) {
 
     $mail->send();
    
-    echo 'Message has been sent';
+    // echo 'Message has been sent';
+    echo $mail;
 } catch (Exception $e) {
     echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
 }
