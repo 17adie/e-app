@@ -20,9 +20,9 @@ const main = {
                     let form_count = resp.map(v => v.f_count)
                     let form_name = resp.map(v => v.form)
     
-                    console.log({resp})
-                    console.log({form_count})
-                    console.log({form_name})
+                    // console.log({resp})
+                    // console.log({form_count})
+                    // console.log({form_name})
     
                     let ctx = document.getElementById("form_summary");
                     ctx.height = 150;
@@ -369,6 +369,57 @@ const main = {
           });
       },
   },
+    update_disapprove_tag: function(at_id){
+        const params = {
+            _id: at_id,
+        };
+        app.crud.request('sp-update_disapprove_tag', params, async function (resp) {
+            // console.log('update iddsss')
+        })
+    },
+    check_disapproved: function(){
+        const params = {
+            _requestor_id: uid,
+        };
+        app.crud.request('sp-get_disapproved_document', params, async function (resp) {
+        // console.log({resp})
+
+        if(resp.length != 0) {
+
+            let approver_tbl_id = []
+    
+            await resp.forEach(v => approver_tbl_id.push(v.approver_tbl_id))
+    
+            let at_id = approver_tbl_id.toString() 
+
+            await $('#disapproved_modal').modal('show')
+
+            let td = await resp.map(v => {
+                return (`
+                    <tr>
+                        <th scope="row">${v.trans_no}</th>
+                        <td>${v.approver_name}</td>
+                        <td>${v.form}</td>
+                        <td>${v.disapprove_remarks}</td>
+                        <td>For Revision</td>
+                    </tr>
+                `) 
+            })
+
+            await $('#tbl_disapproved_list tbody').html(td)
+    
+            // console.log({at_id})
+    
+            main.fn.update_disapprove_tag(at_id)
+
+        }
+
+
+        })
+
+        
+        
+    },
   }
 }
 
@@ -377,6 +428,7 @@ app.get.dashboard_count(uid, function(resp) {
   main.fn.tbl.my_request()
   main.fn.tbl.for_my_approval()
   main.fn.chart.request_summary()
+  main.fn.check_disapproved()
 
   let d = resp = undefined ? '' : resp[0]
 
@@ -457,23 +509,6 @@ $(document)
     let { tbl_id , trans_no, document_title} = $(this).data()
 
     let text = `Trans#: ${trans_no} \n Document: ${document_title}`
-
-    // swal({
-    //     title:"Are you sure you want to cancel?",
-    //     text: text,
-    //     type:"info",
-    //     showCancelButton:!0,
-    //     confirmButtonColor:"#DD6B55",
-    //     confirmButtonText:"Yes",
-    //     closeOnConfirm:!1
-    // },function(){
-        
-    //     main.fn.cancel_document(tbl_id, function(resp){
-    //         swal('Document Cancelled!','','success');
-    //         $('#request_tbl').DataTable().draw(false) // refresh with false = to retain page when draw
-    //     })
-        
-    // })
 
     Swal.fire({
         title:"Are you sure you want to cancel?",

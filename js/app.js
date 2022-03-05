@@ -236,7 +236,7 @@ const app = {
                 timeout: 50000,
                 success: function(data, textStatus, xhr){
 
-                    console.log(textStatus)
+                    // console.log(textStatus)
 
                     let enc_resp = JSON.parse(data);
 
@@ -272,7 +272,7 @@ const app = {
                 timeout: 50000,
                 success: function(data, textStatus, xhr){
 
-                    console.log(textStatus)
+                    // console.log(textStatus)
 
                     let enc_resp = JSON.parse(data);
 
@@ -310,7 +310,7 @@ get_list:  {
             timeout: 50000,
             success: function(data, textStatus, xhr){
 
-                console.log(textStatus)
+                // console.log(textStatus)
 
                 let enc_resp = JSON.parse(data);
 
@@ -342,7 +342,7 @@ crud : {
             timeout: 50000,
             success: function(data, textStatus, xhr){
 
-                console.log(textStatus)
+                // console.log(textStatus)
 
                 let enc_resp = JSON.parse(data);
 
