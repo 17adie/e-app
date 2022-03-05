@@ -1,4 +1,6 @@
 <?php
+// EMAIL NOTIFICATION FROM APPROVER TO REQUESTOR
+
 header('Access-Control-Allow-Origin: *');
 
 include 'get_credential_phpmailer.php';
@@ -29,20 +31,20 @@ if( isset($_POST['data']) ) {
   $message = $data['req_message'];
   $tos = $data['email_to'];
   $trans_no = $data['trans_no'];
-  $date_needed = $data['date_needed'];
   $requestor = $data['requestor'];
   $eapp_page = '<a href="'. E_WEB .'" target="_blank">E-Approvals</a>';
-  $date_request = date("Y-m-d h:i:sa");
+  $date_request = $data['date_request'];
   $form = $data['form_name'];
+  $approver_remarks = $data['approver_remarks'];
 
   $mes = "Greetings! <br><br>" .
-         "Please be informed that an E-Approval document awaits your approval. <br><br>" . 
-         "Trans No.: <strong>" . $trans_no . "</strong><br>" . 
+         "Please be informed that one of the documents that you've requested has beed approved. <br><br>" . 
          "Requestor: <strong>" . $requestor . "</strong><br>" . 
+         "Trans No.: <strong>" . $trans_no . "</strong><br>" . 
          "Form: <strong>" . $form . "</strong><br>" . 
          "Document Title: <strong>" . $subject . "</strong><br>" . 
-         "Message: <strong>" . $message . "</strong><br>" . 
-         "Date Needed: <strong>" . $date_needed . "</strong><br>" . 
+         "Requestor's Message: <strong>" . $message . "</strong><br>" . 
+         "Remarks: <strong>" . $approver_remarks . "</strong><br>" . 
          "Date Requested: <strong>" . $date_request . "</strong><br><br><br>" . 
          "To proceed with the transaction, please go to: " . $eapp_page . " page. <br><br><br>" .
          "This is a system-generated email, please do not reply."
@@ -61,7 +63,7 @@ if( isset($_POST['data']) ) {
 
     $mail->isHTML(true);                                  //Set email format to HTML
     $mail->setFrom(EMAIL, 'E-APP NOTIFICATION');
-    $mail->Subject = "E-Approval Pending Document: " . $subject;
+    $mail->Subject = "E-Approval Document Status Update : Document Approved";
     $mail->Body    = $mes;
 
     

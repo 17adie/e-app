@@ -23,7 +23,7 @@ const main = {
               {data: "filename_main", title: "Document File", className: 'filename_main', sortable : false},
               {data: "document_title", title: "Subject", className: 'document_title'},
               {data: "requestor_message", title: "Message", className: 'requestor_message', sortable : false},
-              {data: "date_requests", title: "Date Requested", className: 'date_requests'},
+              {data: "date_request", title: "Date Requested", className: 'date_request'},
               {data: "date_needed", title: "Date Needed", className: 'date_needed'},
               {title: "Priority", className: 'priority_level', sortable : false},
               {title: "Actions", className: 'td_action', sortable : false}
@@ -102,7 +102,12 @@ const main = {
                           'data-tbl_id': data.tbl_id,
                           'data-approver_id': data.approver_id,
                           'data-document_title': data.document_title,
+                          'data-requestor_message': data.requestor_message,
+                          'data-email': data.email,
+                          'data-trans_no': data.trans_no,
                           'data-requestor_name': data.requestor_name,
+                          'data-form': data.form,
+                          'data-date_request': data.date_request,
 
                   });
 
@@ -158,23 +163,31 @@ main.fn.tbl.to_approve_documents()
 $(document) 
 
 .off('click', '.approve_docs').on('click', '.approve_docs', function(){
-  let {tbl_id, approver_id, document_title, requestor_name} = $(this).data()
-
+  let {tbl_id, approver_id, document_title, requestor_message, email, trans_no, requestor_name, form, date_request} = $(this).data()
+  let email_to = email.split() // convert to array for global notification
   let text = `<small>Subject: </small> ${document_title} <br> <small>Requestor: </small> ${requestor_name}`
 
-  // swal({
+  // Swal.fire({
   //   title:"Are you sure you want to approve this document?",
-  //   text: text,
-  //   type:"info",
-  //   showCancelButton:!0,
-  //   confirmButtonColor:"#DD6B55",
-  //   confirmButtonText:"Yes",
-  //   closeOnConfirm:!1
-  // },function(){
-  //   main.fn.docs_verification(tbl_id, approver_id, 'a', '', function(resp){
-  //     swal('Document Approved!','','success');
-  //     $('#for_approval_request_tbl').DataTable().draw(false) // refresh with false = to retain page when draw
+  //   html: text,
+  //   input: 'text',
+  //   inputPlaceholder: 'Enter Remarks (optional)',
+  //   icon:'question',
+  //   showCancelButton: true,
+  //   confirmButtonText: 'Yes!',
+  // }).then((result) => {
+
+   
+
+  //   // console.log({a_remarks})
+  //   if (result.isConfirmed) {
+  //     let a_remarks = result.value.trim()
+  //     main.fn.docs_verification(tbl_id, approver_id, 'a', '', '', a_remarks, function(resp){
+  //       Swal.fire('Document Approved!', '', 'success')
+  //       $('#for_approval_request_tbl').DataTable().draw(false) // refresh with false = to retain page when draw
   //     })
+  //   }
+
   // })
 
   Swal.fire({
@@ -185,21 +198,37 @@ $(document)
     icon:'question',
     showCancelButton: true,
     confirmButtonText: 'Yes!',
+    showLoaderOnConfirm: true,
+    allowEscapeKey: false,
+    allowOutsideClick: false,
+    preConfirm: (approver_remarks) => {
+      console.log({approver_remarks})
+     
+        return new Promise((resolve, reject) => { // for sweetalert loader ..
+          main.fn.docs_verification(tbl_id, approver_id, 'a', '', '', approver_remarks, function(resp){
+            app.email_notification({ // notification for notifed person
+              doc_title : document_title,  
+              req_message: requestor_message,
+              email_to : email_to, 
+              trans_no : trans_no,
+              requestor : requestor_name,
+              form_name : form,
+              date_request : date_request,
+              approver_remarks: approver_remarks == '' ? 'N/A' : approver_remarks,
+              file_name: 'email_notification_from_approver'}, function(resp){
+              console.log('notif', {resp})
+              return resolve(resp)
+            })
+          })
+        }).catch(err => { console.log(err) });
+         
+      },
   }).then((result) => {
-
-   
-
-    // console.log({a_remarks})
     if (result.isConfirmed) {
-      let a_remarks = result.value.trim()
-      main.fn.docs_verification(tbl_id, approver_id, 'a', '', '', a_remarks, function(resp){
-        Swal.fire('Document Approved!', '', 'success')
-        $('#for_approval_request_tbl').DataTable().draw(false) // refresh with false = to retain page when draw
-      })
+      Toast.fire({ icon: 'success', title: 'Document approved!' })
+      $('#for_approval_request_tbl').DataTable().draw(false) // refresh with false = to retain page when draw
     }
-
   })
-  
 
 })
 
@@ -207,32 +236,6 @@ $(document)
   let {tbl_id, approver_id, document_title, requestor_name} = $(this).data()
 
   let text = `Subject: ${document_title} \n Requestor: ${requestor_name}`
-  // swal({
-  //   title:"Are you sure you want to disapprove this document?",
-  //   text: text,
-  //   html: '<input type="text">',
-  //   type:"input",
-  //   inputPlaceholder: 'Please enter reason',
-  //   showCancelButton:!0,
-  //   confirmButtonColor:"#DD6B55",
-  //   confirmButtonText:"Yes",
-  //   closeOnConfirm: !1
-  // },function(inputValue){
-    
-  //   if (inputValue === false) return false; // for cancel button
-
-  //   let reason = inputValue.trim()
-
-  //   if(reason) {
-  //     main.fn.docs_verification(tbl_id, approver_id, 'd', reason, function(){
-  //     swal('Document Dispproved!',"Reason: " + inputValue,'error');
-  //     $('#for_approval_request_tbl').DataTable().draw(false) // refresh with false = to retain page when draw
-  //     })
-  //   } else {
-  //     swal.showInputError("You need to write something!");
-  //   }
-    
-  // })
 
   Swal.fire({
     title:"Are you sure you want to disapprove this document?",
