@@ -292,6 +292,42 @@ const app = {
 
                 }
             });
+        },
+        request_date: function (procedure_name, params, callback) {
+
+            $.ajax({
+                url: server_url + '/ajax/api/get_table_date.php',
+                data: {
+                    procedure_name,
+                    params
+                },
+
+                type: 'POST',
+                dataType: 'html',
+                // crossDomain: true,
+                timeout: 50000,
+                success: function(data, textStatus, xhr){
+
+                    // console.log(textStatus)
+
+                    let enc_resp = JSON.parse(data);
+
+                    if(enc_resp.error == undefined){
+                        return callback(enc_resp)
+                    }else{
+                        let api_error = enc_resp.error
+                        console.log('Failed to communicate with the server. Error code: ' + api_error.code,'Server Timeout')
+                    }
+
+                    // return callback(data)
+                },
+                error: function(resp){
+
+                    // alert('Failed to establish connection to the server. Please check your network.');
+                    // req(true);
+
+                }
+            });
         }
 },
 // GET LIST API

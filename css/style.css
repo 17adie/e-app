@@ -14822,5 +14822,10 @@ div.no-data-yet i {
   color: white;
 }
 
-
 /* toast color end */
+
+.custom-container-overall-report {
+    background-color: #f5f5f5;
+    padding: 10px;
+    border-radius: 10px;
+}

@@ -2,9 +2,40 @@ app.log.check_session()
 
 let uid = app.cookie.get('uid');
 let issued_by;
+let myBarChart;
 
 const main = {
   fn: {
+    chart: {
+      get_status: function(cb){
+          const filters = main.fn.filter.get_status()
+          const params = {
+              _date_from: filters.d_from,
+              _date_to: filters.d_to,
+              _date_year: filters.d_year,
+          };
+          
+          app.crud.request('sp-get_report_status_by_month_year_chart', params, function (response) {
+          
+            return cb(response)
+          })
+      }
+    },
+    filter: {
+      get_status: function(){
+        let d_from = $('#date_from').val()
+        let d_to = $('#date_to').val()
+        let d_year = $('#inp_year').val()
+      
+        const filters = {
+            "d_from":d_from,
+            "d_to": d_to,
+            "d_year" : d_year
+       };
+
+       return filters;
+      },
+    },
     tbl: {
       // DATATABLES
       notification: function() {
@@ -482,6 +513,150 @@ const main = {
 
     });
 },
+get_status: function() {
+
+  let unfiltered_rows_count;
+
+  const columns = [
+      {data: "month", title: "Month", className: 'month', sortable : false},
+      {data: "approved", title: "Approved", className: 'approved', sortable : false},
+      {data: "issued", title: "Issued", className: 'issued', sortable : false},
+      {data: "ongoing", title: "Ongoing", className: 'ongoing', sortable : false},
+      {data: "disapproved", title: "Disapproved", className: 'disapproved', sortable : false},
+      {data: "cancelled", title: "Cancelled", className: 'cancelled', sortable : false},
+     
+  ]
+
+  $('#status_tbl').dataTable({
+      serverSide: true,
+      lengthChange: false,
+      searchDelay: 1000,
+      searching: true,
+      processing: true,
+      searching: false,
+      columns: columns,
+      // order: [[ 4, "asc" ]],  
+      columnDefs: [
+        {
+            render: function ( data, type, row ) {
+                return row.month;
+            },
+            // targets: -1
+        }
+      ],
+     
+      ajax: function (data, callback, settings) {
+          const filters = main.fn.filter.get_status()
+          const params = {
+              _limit_offset: data.start,
+              _date_from: filters.d_from,
+              _date_to: filters.d_to,
+              _date_year: filters.d_year,
+          };
+          // console.log({params})
+          app.view_table.request_date('sp-get_report_status_by_month_year', params, function (response) {
+            
+              let resp = response.data || [];
+
+              // console.log({resp})
+              
+              if (data.draw === 1) { // if this is the first draw, which means it is unfiltered
+                  unfiltered_rows_count = response._total_count;
+              }
+
+              let total_count = response._total_count;
+
+              callback({
+
+                  draw: data.draw,
+                  data: resp,
+                  recordsTotal: unfiltered_rows_count,
+                  recordsFiltered: total_count
+              });
+          });
+      },
+      createdRow: function( row, data, dataIndex ) {
+
+      }
+
+  });
+},
+get_status_by_name: function() {
+
+  let unfiltered_rows_count;
+
+  const columns = [
+      {data: "requestor", title: "Employee Name", className: 'requestor', sortable : false},
+      {data: "jan", title: "Jan", className: 'jan', sortable : false},
+      {data: "feb", title: "Feb", className: 'feb', sortable : false},
+      {data: "mar", title: "Mar", className: 'mar', sortable : false},
+      {data: "apr", title: "Apr", className: 'apr', sortable : false},
+      {data: "may", title: "May", className: 'may', sortable : false},
+      {data: "jun", title: "Jun", className: 'jun', sortable : false},
+      {data: "jul", title: "Jul", className: 'jul', sortable : false},
+      {data: "aug", title: "Aug", className: 'aug', sortable : false},
+      {data: "sept", title: "Sept", className: 'sept', sortable : false},
+      {data: "oct", title: "Oct", className: 'oct', sortable : false},
+      {data: "nov", title: "Nov", className: 'nov', sortable : false},
+      {data: "dec", title: "Dec", className: 'dec', sortable : false},
+    
+     
+  ]
+
+  $('#status_by_name_tbl').dataTable({
+      serverSide: true,
+      lengthChange: false,
+      searchDelay: 1000,
+      searching: true,
+      processing: true,
+      searching: false,
+      columns: columns,
+      // order: [[ 4, "asc" ]],  
+      columnDefs: [
+        {
+            render: function ( data, type, row ) {
+                return row.month;
+            },
+            // targets: -1
+        }
+      ],
+     
+      ajax: function (data, callback, settings) {
+          const filters = main.fn.filter.get_status()
+          const params = {
+              _limit_offset: data.start,
+              _date_from: filters.d_from,
+              _date_to: filters.d_to,
+              _date_year: filters.d_year,
+          };
+          // console.log({params})
+          app.view_table.request_date('sp-get_report_status_by_name', params, function (response) {
+            
+              let resp = response.data || [];
+
+              // console.log({resp})
+              
+              if (data.draw === 1) { // if this is the first draw, which means it is unfiltered
+                  unfiltered_rows_count = response._total_count;
+              }
+
+              let total_count = response._total_count;
+
+              callback({
+
+                  draw: data.draw,
+                  data: resp,
+                  recordsTotal: unfiltered_rows_count,
+                  recordsFiltered: total_count
+              });
+          });
+      },
+      createdRow: function( row, data, dataIndex ) {
+
+      }
+
+  });
+},
     
   },
   update_read: function(notif_id, cb){
@@ -597,10 +772,13 @@ main.fn.tbl.notification()
 main.fn.tbl.cancelled()
 main.fn.tbl.request()
 main.fn.tbl.approval()
+main.fn.tbl.get_status()
+main.fn.tbl.get_status_by_name()
 app.get.user_details(uid, function(resp){
   let ud = resp = undefined ? '' : resp[0]
     issued_by = ud.last_name + ', ' + ud.first_name;
 })
+
 
 $('#modal-view_notif_details').on('hidden.bs.modal', function () {
     $(this).find("div.col-7").html('').end()
@@ -730,9 +908,9 @@ $(document)
   let email_to = email.split() // convert to array for global notification
   let text = `<small>Trans #: </small> ${trans_no} <br> <small>Requestor: </small> ${requestor}`
 
-  console.log({email})
-  console.log({trans_no})
-  console.log({tbl_id})
+  // console.log({email})
+  // console.log({trans_no})
+  // console.log({tbl_id})
   // console.log({docs_status})
   // console.log({email_to})
 
@@ -787,6 +965,110 @@ $(document)
     })
     
   })
+
+})
+
+.off('click', '.search_data').on('click', '.search_data', function(){
+
+  const { d_from, d_to, d_year} = main.fn.filter.get_status()
+
+  // if(d_from == '' || d_to == '' || d_year == '') {
+  //   Toast.fire({ icon: 'error', title: 'Please fill all required fields.' })
+  //   return
+  // }
+
+  // console.log({d_from})
+  // console.log({d_to})
+  // console.log('d_from > d_to', d_from > d_to)
+
+  if(parseInt(d_from) > parseInt(d_to)) {
+    Toast.fire({ icon: 'error', title: 'Invalid date range.' })
+    return
+  }
+
+  main.fn.chart.get_status( function(resp){
+    // console.table(resp)
+
+    let get_months = resp.map(v => v.month);
+    let get_approved = resp.map(v => v.approved)
+    let get_issued = resp.map(v => v.issued)
+    let get_ongoing = resp.map(v => v.ongoing)
+    let get_disapproved = resp.map(v => v.disapproved)
+    let get_cancelled = resp.map(v => v.cancelled)
+
+    // console.log({get_approved})
+    // console.log({get_issued})
+    // console.log({get_ongoing})
+    // console.log({get_disapproved})
+    // console.log({get_cancelled})
+    // console.log({get_months})
+
+    let chartStatus = Chart.getChart("barChartSummary"); // <canvas> id
+    if (chartStatus != undefined) {
+      chartStatus.destroy();
+    }
+   
+    var ctx = document.getElementById("barChartSummary").getContext("2d");
+
+    var data = {
+        labels: get_months,
+        datasets: [
+            {
+                label: "Approved",
+                backgroundColor: "rgba(75, 192, 192, 0.2)",
+                borderColor: "rgb(75, 192, 192)",
+                borderWidth: 1,
+                data: get_approved
+            },
+            {
+                label: "Issued",
+                backgroundColor: "rgba(153, 102, 255, 0.2)",
+                borderColor: "rgb(153, 102, 255)",
+                borderWidth: 1,
+                data: get_issued
+            },
+            {
+                label: "Ongoing",
+                backgroundColor: "rgba(255, 205, 86, 0.2)",
+                borderColor: "rgb(255, 205, 86)",
+                borderWidth: 1,
+                data: get_ongoing
+            },
+            {
+                label: "Disapproved",
+                backgroundColor: "rgba(255, 99, 132, 0.2)",
+                borderColor: "rgb(255, 99, 132)",
+                borderWidth: 1,
+                data: get_disapproved
+            },
+            {
+              label: "Cancelled",
+              backgroundColor: "rgba(255, 159, 64, 0.2)",
+              borderColor: "rgb(255, 159, 64)",
+              borderWidth: 1,
+              data: get_cancelled
+            },
+        ]
+    };
+
+    myBarChart = new Chart(ctx, {
+        type: 'bar',
+        data: data,
+        options: {
+          scales: {
+            y: {
+              beginAtZero: true
+            }
+          }
+        },
+    });
+
+    $("#status_tbl").DataTable().draw();
+    $("#status_by_name_tbl").DataTable().draw();
+  })
+
+ 
+
 
 })
 
