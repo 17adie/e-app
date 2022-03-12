@@ -147,15 +147,11 @@ const main = {
                         _uid: uid
         
                     };
-                    app.view_table.request_search('sp-get_all_approval_history', params, function (response) {
+                    app.view_table.request_search('sp-get_all_for_approval_docs', params, function (response) {
                       
                         let resp = response.data || [];
-
-                        // console.log({resp})
-
-                        resp = resp.filter( v => v.docs_status == 0)
-
-                        // console.log({resp})
+                      
+                        // resp = resp.filter( v => v.docs_status == 0)
                         
                         if (data.draw === 1) { // if this is the first draw, which means it is unfiltered
                             unfiltered_rows_count = response._total_count;
@@ -520,9 +516,19 @@ $(document)
     
         if (result.isConfirmed) {
             main.fn.cancel_document(tbl_id, function(resp){
-                Toast.fire({ icon: 'success', title: 'Document Cancelled!'})
-                $('#request_tbl').DataTable().draw(false) // refresh with false = to retain page when draw
+                // call fn to update the dashboard count (for approvals widget)
+                app.get.dashboard_count(uid, function(resp) {
+
+                    let d = resp = undefined ? '' : resp[0]
+
+                    // update value
+                    $('.for_approval_count').html(d.user_approval_count)
+
+                    Toast.fire({ icon: 'success', title: 'Document Cancelled!'})
+                    $('#request_tbl').DataTable().draw(false) // refresh with false = to retain page when draw
+                })
             })
+           
         }
     
       })

@@ -19,7 +19,7 @@ $date_year = $params['_date_year'];
 // $sort_direction = $params['_sort_direction'];
 
 
-$query = "CALL `$procedure_name`(:offset,:date_from,:date_to,:date_year)";
+$query = "CALL `$procedure_name`(:offset,:date_from,:date_to,:date_year,@_total_count)";
 
 try{
     $db = getConnection();
@@ -37,10 +37,10 @@ try{
 // fetch the output
     $statement->closeCursor();
 
-    // $response = $db->query('SELECT @_total_count AS _total_count')->fetch(PDO::FETCH_ASSOC);
+    $response = $db->query('SELECT @_total_count AS _total_count')->fetch(PDO::FETCH_ASSOC);
 
     $row = array(
-        "_total_count" => count($resp),
+        "_total_count" => $response['_total_count'],
         "data" => $resp
     );
 

@@ -66,6 +66,9 @@ const main = {
                   app.view_table.request('sp-get_to_approve_document_request', params, function (response) {
                     
                       let resp = response.data || [];
+
+                      // to get all status equals to 0 = ongoing
+                      // resp = resp.filter( v => v.docs_status == 0)
                      
                       if (data.draw === 1) { // if this is the first draw, which means it is unfiltered
                           unfiltered_rows_count = response._total_count;
