@@ -972,10 +972,10 @@ $(document)
 
   const { d_from, d_to, d_year} = main.fn.filter.get_status()
 
-  // if(d_from == '' || d_to == '' || d_year == '') {
-  //   Toast.fire({ icon: 'error', title: 'Please fill all required fields.' })
-  //   return
-  // }
+  if(d_from == '' || d_to == '' || d_year == '') {
+    Toast.fire({ icon: 'error', title: 'Please fill all required fields.' })
+    return
+  }
 
   // console.log({d_from})
   // console.log({d_to})
