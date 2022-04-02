@@ -16,7 +16,7 @@ const main = {
                 
 
                 if(resp.length != 0){
-                    
+                    $('.no-data-yet').hide();
                     let form_count = resp.map(v => v.f_count)
                     let form_name = resp.map(v => v.form)
     
@@ -44,18 +44,19 @@ const main = {
                                     "#187bcd",
                                     "#2a9df4",
                                     "#d0efff"
-                                ]
+                                ],
     
                             }],
                             labels: form_name
                         },
                         options: {
-                            responsive: true
+                            responsive: true,
+                            maintainAspectRatio: true,
                         }
                     });
                     return
                 } else {
-                    $('#form_summary').hide()
+                    $('.custom-pie-container').hide()
                     $('.no-data-yet').html(`<i class="fa fa-pie-chart"></i>
                                             <div>No Data Yet.</div>`)
                 }

@@ -87,18 +87,34 @@ const main = {
               },
               createdRow: function( row, data, dataIndex ) {
 
-                $( row ).find('td:eq(-1)')
-                .html(`
-                <div style="display:flex">
-                  <a href="javascript:void(0)" class="custom_action_icon_btn text-success approve_docs" data-toggle="tooltip" data-placement="top" title="Approve" data-original-title="Approve">
-                    <i class="fa fa-check-circle-o"></i>
-                  </a>
-                  <a href="javascript:void(0)" class="custom_action_icon_btn text-danger ml-2 disapprove_docs" data-toggle="tooltip" data-placement="top" title="Disapprove" data-original-title="Disapprove">
-                    <i class="fa fa-remove"></i>
-                  </a>
-                </div>
-                `
-                );
+                let dnow = moment().format("YYYY-MM-DD");
+                let dneed = moment(data.date_needed, 'YYYY-MM-DD')
+
+                let d = dneed.diff(dnow, 'day')
+
+                console.log(d >= 0)
+
+                  $( row ).find('td:eq(-1)')
+                  .html(d >= 0 ?`
+                  <div style="display:flex">
+                    <a href="javascript:void(0)" class="custom_action_icon_btn text-success approve_docs" data-toggle="tooltip" data-placement="top" title="Approve" data-original-title="Approve">
+                      <i class="fa fa-check-circle-o"></i>
+                    </a>
+                    <a href="javascript:void(0)" class="custom_action_icon_btn text-danger ml-2 disapprove_docs" data-toggle="tooltip" data-placement="top" title="Disapprove" data-original-title="Disapprove">
+                      <i class="fa fa-remove"></i>
+                    </a>
+                  </div>
+                  ` : `  
+                  <div style="display:flex">
+                    <a href="javascript:void(0)" class="custom_action_icon_btn text-muted">
+                      <i class="fa fa-check-circle-o"></i>
+                    </a>
+                    <a href="javascript:void(0)" class="custom_action_icon_btn text-danger ml-2 disapprove_docs" data-toggle="tooltip" data-placement="top" title="Disapprove" data-original-title="Disapprove">
+                      <i class="fa fa-remove"></i>
+                    </a>
+                  </div>
+                  `
+                  );
 
                   $( row ).find('td:eq(-1) > div > a')
                       .attr({

@@ -6,6 +6,13 @@ let myBarChart;
 
 const main = {
   fn: {
+    calculate_days: function(date_needed){
+
+      let date_now = moment().format("YYYY-MM-DD");
+      let diff = moment(date_needed, 'YYYY-MM-DD').businessDiff(moment(date_now,'YYYY-MM-DD'));
+
+      return diff;
+    },
     chart: {
       get_status: function(cb){
           const filters = main.fn.filter.get_status()
@@ -46,9 +53,10 @@ const main = {
               {data: "read_status", title: "", className: 'read_status'},
               {data: "trans_no", title: "TRANS#", className: 'trans_no', sortable : false},
               {data: "category", title: "Form", className: 'category'},
-              {data: "docs_status", title: "Document Status", className: 'docs_status', sortable : false},
+              {data: "docs_status", title: "Document Status", className: 'docs_status'},
               {data: "requestor", title: "Requestor", className: 'requestor'},
               {data: "date_request", title: "Date Requested", className: 'date_request'},
+              {title: "Priority", className: 'priority_level', sortable : false},
               {title: "Actions", className: 'td_actions' , sortable : false},
             //   {data: "date_approved", title: "Date Approved", className: 'date_approved'},
           ]
@@ -72,7 +80,13 @@ const main = {
                         return row.tbl_id;
                     },
                     targets: -1
-                }
+                },
+                {
+                  render: function ( data, type, row ) {
+                      return row.tbl_id + ' ' + row.tbl_id;
+                  },
+                  targets: -2
+              }
             ],
              
               ajax: function (data, callback, settings) {
@@ -134,7 +148,21 @@ const main = {
                         "data-tbl_id": data.tbl_id
                     });
 
+                  // DISPLAY PRIO WITH TEXT
 
+                  if(data.docs_status == 1) {
+                    let date_needed = moment(data.date_needed, 'YYYY-MM-DD')
+                    let diff = main.fn.calculate_days(date_needed)
+
+                    app.get.priority_status(diff, function(prio){
+                      
+                      $( row ).find('td.priority_level').html(prio)
+
+                    })
+                  } else {
+                    $( row ).find('td.priority_level').html('N/A')
+                  }
+                  
 
                 $( row ).find('td.read_status')
                   .html(data.read_status != 1 ?`
@@ -147,14 +175,18 @@ const main = {
                   </a>`
                   )
 
+                  // exclude process in normal user but notified.
+                  let _utype = app.cookie.get("utype");
+
                   $( row ).find('td:eq(-1)')
-                  .html(data.docs_status == 1 ?` 
-                  <a href="javascript:void(0)" class="custom_action_icon_btn process_document text-success" data-form="${data.form}" data-document_title="${data.document_title}" data-email="${data.email}" data-requestor="${data.requestor}" data-docs_status="${data.docs_status}" data-tbl_id="${data.tbl_id}"  data-trans_no="${data.trans_no}" data-toggle="tooltip" data-placement="top" title="Process" data-original-title="Process">
+                  .html(_utype == 'user_np' ? data.docs_status == 1 ?  data.issued_tag == 1 ?
+                  `<span class="label label-sm label-success">Processed</span>` :
+                  `<a href="javascript:void(0)" class="custom_action_icon_btn process_document text-success" data-form="${data.form}" data-document_title="${data.document_title}" data-email="${data.email}" data-requestor="${data.requestor}" data-docs_status="${data.docs_status}" data-tbl_id="${data.tbl_id}"  data-trans_no="${data.trans_no}" data-toggle="tooltip" data-placement="top" title="Process" data-original-title="Process">
                     <i class="fa fa-send"></i>
                   </a>` : 
                   `<div href="javascript:void(0)" class="custom_action_icon_btn text-muted">
                     <i class="fa fa-send"></i>
-                  </div>`
+                  </div>` : 'N/A'
                   )
                       
                   $(row).addClass('hover_cls');
@@ -880,6 +912,8 @@ $(document)
     $('.txt_notified_person_list').html(notif_list)
     $('.file_main_attch').html(d.filename_main == '' || d.filename_main == null ? 'NA' : download_link_main)
     $('.file_sup_attch').html(d.filename_sup == '' || d.filename_sup == null ? 'NA' : download_link_sup)
+    $('.txt_disapproved_remarks').html(d.disapproved_remarks)
+
 
 
     app.loader('hide', '#modal-view_notif_details .modal-body');
@@ -959,6 +993,7 @@ $(document)
       },
     }).then((result) => {
       if (result.isConfirmed) {
+        $("#notification_tbl").DataTable().draw();
         Toast.fire({ icon: 'success', title: 'Document notification sent successfully' })
       }
   

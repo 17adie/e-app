@@ -107,7 +107,7 @@
                         <div class="card">
                             <h4 class="card-header custom-card-header-ongoing">My Recent Document Request (On-Going)</h4>
                             <div class="card-body">
-                                <div class="table-responsive">
+                                <div class="table-responsive" style="height: 45vh">
                                     <table class="table header-border" id="request_tbl" style="white-space: nowrap">
                                         
                                     </table>
@@ -120,10 +120,13 @@
                         <div class="card">
                             <h4 class="card-header custom-card-header-ongoing">Form Summary</h4>
                             <div class="card-body">
-                                <div class="no-data-yet">
+                                <div class="no-data-yet" style="height: 45vh">
                                     
                                 </div>
-                                <canvas id="form_summary" width="500" height="250"></canvas>
+                                <div class="custom-pie-container">
+                                    <canvas id="form_summary"></canvas>
+                                </div>
+                                <!-- <canvas id="form_summary" width="250" height="100"></canvas> -->
                             </div>
                         </div>
                     </div>
@@ -327,6 +330,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js"></script>
 
     <script src="../js/chart.min.js"></script>
+    <!-- <script src="../js/chartjs-plugin-datalabels-v2.0.0.js"></script> -->
   
 
     <script src="../js/app.js"></script>

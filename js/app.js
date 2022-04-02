@@ -60,9 +60,9 @@ const app = {
 
             let prio;
             
-            if(diff < 3) { // alert when less than 3 days
+            if(diff < 4) { // alert when less than 4 days
                 prio = '<span class="label label-sm label-danger">High</span>';
-            } else if (diff > 2 && diff < 6){ // alert when 3 - 5 days
+            } else if (diff > 3 && diff < 6){ // alert when 4 - 5 days
                 prio = '<span class="label label-sm label-warning">Medium</span>';
             } else if (diff > 5) { // alert when greater than 6 days
                 prio = '<span class="label label-sm label-success">Low</span>';
