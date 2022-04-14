@@ -1,3 +1,5 @@
+app.log.check_session()
+
 Ladda.bind('.ladda-button')
 
 let uid = app.cookie.get("uid");
