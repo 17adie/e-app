@@ -10908,7 +10908,7 @@ table.dataTable thead .sorting::after {
   background-color: #7571f9; }
 
 .badge-warning {
-  background-color: #f29d56; }
+  background-color: #FFFF00; } /* old f29d56*/
 
 .badge-danger {
   background-color: #ff5e5e; }
@@ -14841,3 +14841,17 @@ div.no-data-yet i {
   margin-right: auto;
   display: block;
 }
+
+
+.custom-badge {
+  display: inline-block;
+  padding: 0.25em 0.4em;
+  font-size: 75%;
+  /* font-weight: 700; */
+  line-height: 1;
+  text-align: center;
+  white-space: pre-line;
+  vertical-align: baseline;
+  border-radius: 0.25rem; }
+  .custom-badge:empty {
+    display: none; }

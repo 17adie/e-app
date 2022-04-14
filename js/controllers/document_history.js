@@ -26,7 +26,22 @@ const main = {
           
             return cb(response)
           })
-      }
+      },
+      get_report: function(category, cb){
+        const filters = main.fn.filter.get_status()
+        const params = {
+            _date_from: filters.d_from,
+            _date_to: filters.d_to,
+            _date_year: filters.d_year,
+            _cat: category
+        };
+        
+        app.crud.request('sp-get_all_report_barchart', params, function (response) {
+        
+          return cb(response)
+        })
+      },
+      
     },
     filter: {
       get_status: function(){
@@ -72,6 +87,35 @@ const main = {
                 infoFiltered: "",  // filtered from n total entries datatables remove kasi mali bilang lagi kulang ng isa kapag nag a add.
                 searchPlaceholder: "Forms, Requestor"
             },
+            dom: 'Bfrtip',
+            buttons: [
+              { 
+                extend: 'pdf', 
+                className: 'btn-primary' , 
+                exportOptions: {
+                  columns: [ 1, 2, 3, 4, 5, 6 ]
+                }
+              },
+              { 
+                extend: 'csv', 
+                className: 'btn-primary' , 
+                exportOptions: {
+                  columns: [ 1, 2, 3, 4, 5, 6 ]
+                }
+              },
+              { 
+                extend: 'print', 
+                className: 'btn-primary' , 
+                exportOptions: {
+                  columns: [ 1, 2, 3, 4, 5, 6 ]
+                }
+              },
+                // 'copy', 
+                // 'csv', 
+                // 'excel', 
+                // 'pdf', 
+                // 'print'
+            ],
               columns: columns,
               order: [[ 0, "asc" ], [ 5, "asc" ]],  
               columnDefs: [
@@ -83,10 +127,55 @@ const main = {
                 },
                 {
                   render: function ( data, type, row ) {
-                      return row.tbl_id + ' ' + row.tbl_id;
+                      // return row.tbl_id + ' ' + row.tbl_id;
+
+                      let text;
+
+                      if(row.docs_status == 1) {
+                        let date_needed = moment(row.date_needed, 'YYYY-MM-DD')
+                        let diff = main.fn.calculate_days(date_needed)
+    
+                        app.get.priority_status(diff, function(prio){
+                          
+                          text = prio;
+    
+                        })
+                      } else {
+                        text = 'N/A'
+                      }
+
+                      return text;
                   },
                   targets: -2
-              }
+              },
+              {
+                render: function ( data, type, row ) {
+
+                    // DISPLAY STATUS WITH TEXT
+                    let docs_status;
+
+                    switch(row.docs_status){
+                        case '0':
+                            docs_status = 'Pending';
+                            break;
+                        case '1':
+                            docs_status = 'Approved';
+                            break;
+                        case '2':
+                            docs_status = 'Disapproved';
+                            break;
+                        case '3':
+                            docs_status = 'Cancelled';
+                            break;
+                        default:
+                            docs_status = 'N/A';
+                            break;
+                    }
+
+                    return docs_status;
+                },
+                targets: -5
+            },
             ],
              
               ajax: function (data, callback, settings) {
@@ -126,7 +215,7 @@ const main = {
 
                 switch(data.docs_status){
                     case '0':
-                        docs_status = '<span class="label label-sm gradient-4">Ongoing</span>';
+                        docs_status = '<span class="label label-sm gradient-4">Pending</span>';
                         break;
                     case '1':
                         docs_status = '<span class="label label-sm gradient-1">Approved</span>';
@@ -220,6 +309,35 @@ const main = {
               infoFiltered: "",  // filtered from n total entries datatables remove kasi mali bilang lagi kulang ng isa kapag nag a add.
               searchPlaceholder: "Forms, Subject"
           },
+          dom: 'Bfrtip',
+            buttons: [
+              { 
+                extend: 'pdf', 
+                className: 'btn-primary' , 
+                exportOptions: {
+                columns: [ 0, 1, 2, 3, 4, 5 ]
+                }
+              },
+              { 
+                extend: 'csv', 
+                className: 'btn-primary' , 
+                exportOptions: {
+                columns: [ 0, 1, 2, 3, 4, 5 ]
+                }
+              },
+              { 
+                extend: 'print', 
+                className: 'btn-primary' , 
+                exportOptions: {
+                columns: [ 0, 1, 2, 3, 4, 5 ]
+                }
+              },
+                // 'copy', 
+                // 'csv', 
+                // 'excel', 
+                // 'pdf', 
+                // 'print'
+            ],
             columns: columns,
             order: [[ 4, "asc" ]],  
             columnDefs: [
@@ -228,7 +346,35 @@ const main = {
                       return row.tbl_id + ' ' + row.tbl_id;
                   },
                   targets: -1
-              }
+              },
+              {
+                render: function ( data, type, row ) {
+
+                    // DISPLAY STATUS WITH TEXT
+                    let docs_status;
+
+                    switch(row.status){
+                        case '0':
+                            docs_status = 'Pending';
+                            break;
+                        case '1':
+                            docs_status = 'Approved';
+                            break;
+                        case '2':
+                            docs_status = 'Disapproved';
+                            break;
+                        case '3':
+                            docs_status = 'Cancelled';
+                            break;
+                        default:
+                            docs_status = 'N/A';
+                            break;
+                    }
+
+                    return docs_status;
+                },
+                targets: -4
+            },
           ],
            
             ajax: function (data, callback, settings) {
@@ -284,7 +430,7 @@ const main = {
 
               switch(data.status){
                   // case '0':
-                  //     stat = '<span class="label label-sm gradient-4">Ongoing</span>';
+                  //     stat = '<span class="label label-sm gradient-4">Pending</span>';
                   //     break;
                   // case '1':
                   //     stat = '<span class="label label-sm gradient-1">Approved</span>';
@@ -337,6 +483,37 @@ const main = {
             infoFiltered: "",  // filtered from n total entries datatables remove kasi mali bilang lagi kulang ng isa kapag nag a add.
             searchPlaceholder: "Forms, Subject"
         },
+        dom: 'Bfrtip',
+            buttons: [
+              { 
+                extend: 'pdf', 
+                className: 'btn-primary' , 
+                exportOptions: {
+                  columns: [ 0, 1, 2, 3, 4 ]
+                }
+              },
+              { 
+                extend: 'csv', 
+                className: 'btn-primary' , 
+                exportOptions: {
+                columns: [ 0, 1, 2, 3, 4 ]
+
+                }
+              },
+              { 
+                extend: 'print', 
+                className: 'btn-primary' , 
+                exportOptions: {
+                columns: [ 0, 1, 2, 3, 4 ]
+
+                }
+              },
+                // 'copy', 
+                // 'csv', 
+                // 'excel', 
+                // 'pdf', 
+                // 'print'
+            ],
           columns: columns,
           order: [[ 4, "asc" ]],  
           columnDefs: [
@@ -345,7 +522,35 @@ const main = {
                     return row.tbl_id + ' ' + row.tbl_id;
                 },
                 targets: -1
-            }
+            },
+            {
+              render: function ( data, type, row ) {
+
+                  // DISPLAY STATUS WITH TEXT
+                  let docs_status;
+
+                  switch(row.docs_status){
+                      case '0':
+                          docs_status = 'Pending';
+                          break;
+                      case '1':
+                          docs_status = 'Approved';
+                          break;
+                      case '2':
+                          docs_status = 'Disapproved';
+                          break;
+                      case '3':
+                          docs_status = 'Cancelled';
+                          break;
+                      default:
+                          docs_status = 'N/A';
+                          break;
+                  }
+
+                  return docs_status;
+              },
+              targets: -3
+          },
         ],
          
           ajax: function (data, callback, settings) {
@@ -402,7 +607,7 @@ const main = {
 
             switch(data.docs_status){
                 case '0':
-                    docs_status = '<span class="label label-sm gradient-4">Ongoing</span>';
+                    docs_status = '<span class="label label-sm gradient-4">Pending</span>';
                     break;
                 case '1':
                     docs_status = '<span class="label label-sm gradient-1">Approved</span>';
@@ -453,6 +658,35 @@ const main = {
           infoFiltered: "",  // filtered from n total entries datatables remove kasi mali bilang lagi kulang ng isa kapag nag a add.
           searchPlaceholder: "Forms, Subject, Requestor"
       },
+      dom: 'Bfrtip',
+            buttons: [
+              { 
+                extend: 'pdf', 
+                className: 'btn-primary' , 
+                exportOptions: {
+                columns: [ 0,1, 2, 3, 4, 5 ]
+                }
+              },
+              { 
+                extend: 'csv', 
+                className: 'btn-primary' , 
+                exportOptions: {
+                columns: [ 0,1, 2, 3, 4, 5 ]
+                }
+              },
+              { 
+                extend: 'print', 
+                className: 'btn-primary' , 
+                exportOptions: {
+                columns: [ 0,1, 2, 3, 4, 5 ]
+                }
+              },
+                // 'copy', 
+                // 'csv', 
+                // 'excel', 
+                // 'pdf', 
+                // 'print'
+            ],
         columns: columns,
         order: [[ 4, "asc" ]],  
         columnDefs: [
@@ -461,7 +695,35 @@ const main = {
                   return row.tbl_id + ' ' + row.tbl_id;
               },
               targets: -1
-          }
+          },
+          {
+            render: function ( data, type, row ) {
+
+                // DISPLAY STATUS WITH TEXT
+                let docs_status;
+
+                switch(row.docs_status){
+                    case '0':
+                        docs_status = 'Pending';
+                        break;
+                    case '1':
+                        docs_status = 'Approved';
+                        break;
+                    case '2':
+                        docs_status = 'Disapproved';
+                        break;
+                    case '3':
+                        docs_status = 'Cancelled';
+                        break;
+                    default:
+                        docs_status = 'N/A';
+                        break;
+                }
+
+                return docs_status;
+            },
+            targets: -4
+        },
       ],
        
         ajax: function (data, callback, settings) {
@@ -517,7 +779,7 @@ const main = {
 
           switch(data.docs_status){
               case '0':
-                  stat = '<span class="label label-sm gradient-4">Ongoing</span>';
+                  stat = '<span class="label label-sm gradient-4">Pending</span>';
                   break;
               case '1':
                   stat = '<span class="label label-sm gradient-1">Approved</span>';
@@ -553,7 +815,7 @@ get_status: function() {
       {data: "month", title: "Month", className: 'month', sortable : false},
       {data: "approved", title: "Approved", className: 'approved', sortable : false},
       {data: "issued", title: "Issued", className: 'issued', sortable : false},
-      {data: "ongoing", title: "Ongoing", className: 'ongoing', sortable : false},
+      {data: "ongoing", title: "Pending", className: 'ongoing', sortable : false},
       {data: "disapproved", title: "Disapproved", className: 'disapproved', sortable : false},
       {data: "cancelled", title: "Cancelled", className: 'cancelled', sortable : false},
      
@@ -707,10 +969,22 @@ get_status_by_name: function() {
 
     let d = resp[0]
 
-    let approver = d.approver_list.split(',')
+    let approver = d.approver_list.split('|')
 
     let approver_list = approver.map((v,i) => {
-        return(`<div>${v}</div>`)
+      let textColor;
+
+      if(v.search(/\bPending\b/) >= 0) {
+          textColor = 'badge-warning'
+      } else if(v.search(/\bApproved\b/) >= 0) {
+          textColor = 'badge-success'
+      } else if(v.search(/\bDisapproved\b/) >= 0) {
+          textColor = 'badge-danger'
+      } else {
+          console.log({textColor})
+      }
+      
+      return(`<div class="m-1 custom-badge ${textColor}" style="font-size: 14px">${v}</div>`)
     }) 
 
     let notif_list = 'N/A';
@@ -734,7 +1008,7 @@ get_status_by_name: function() {
 
     switch(docs_status){
       case 0: 
-        d_stat.html('Ongoing').addClass('gradient-4').removeClass('gradient-1 gradient-2')
+        d_stat.html('Pending').addClass('gradient-4').removeClass('gradient-1 gradient-2')
       break
       case 1: 
         d_stat.html('Approved').addClass('gradient-1').removeClass('gradient-4 gradient-2')
@@ -804,8 +1078,8 @@ main.fn.tbl.notification()
 main.fn.tbl.cancelled()
 main.fn.tbl.request()
 main.fn.tbl.approval()
-main.fn.tbl.get_status()
-main.fn.tbl.get_status_by_name()
+// main.fn.tbl.get_status()
+// main.fn.tbl.get_status_by_name()
 app.get.user_details(uid, function(resp){
   let ud = resp = undefined ? '' : resp[0]
     issued_by = ud.last_name + ', ' + ud.first_name;
@@ -852,12 +1126,28 @@ $(document)
   app.loader('show', '#modal-view_notif_details .modal-body');
   app.get.notif_details(tbl_id, function(resp){
     let d = resp[0]
-    // console.log({d})
+    console.log({d})
 
-    let approver = d.approver_list.split(',')
+    let approver = d.approver_list.split('|')
 
     let approver_list = approver.map((v,i) => {
-        return(`<div>${v}</div>`)
+
+      console.log(v)
+      console.log(v.search(/\bPending\b/) >= 0)
+
+      let textColor;
+
+      if(v.search(/\bPending\b/) >= 0) {
+          textColor = 'badge-warning'
+      } else if(v.search(/\bApproved\b/) >= 0) {
+          textColor = 'badge-success'
+      } else if(v.search(/\bDisapproved\b/) >= 0) {
+          textColor = 'badge-danger'
+      } else {
+          console.log({textColor})
+      }
+
+      return(`<div class="m-1 custom-badge ${textColor}" style="font-size: 14px">${v}</div>`)
     }) 
     
     let notif = d.notified_person_list.split(',')
@@ -882,7 +1172,7 @@ $(document)
 
     switch(docs_status){
       case 0: 
-        d_stat.html('Ongoing').addClass('gradient-4').removeClass('gradient-1 gradient-2')
+        d_stat.html('Pending').addClass('gradient-4').removeClass('gradient-1 gradient-2')
       break
       case 1: 
         d_stat.html('Approved').addClass('gradient-1').removeClass('gradient-4 gradient-2')
@@ -1008,104 +1298,223 @@ $(document)
   const { d_from, d_to, d_year} = main.fn.filter.get_status()
 
   if(d_from == '' || d_to == '' || d_year == '') {
-    Toast.fire({ icon: 'error', title: 'Please fill all required fields.' })
+    Toast.fire({ icon: 'error', title: 'Please fill all required fields.' }) 
     return
   }
-
-  // console.log({d_from})
-  // console.log({d_to})
-  // console.log('d_from > d_to', d_from > d_to)
 
   if(parseInt(d_from) > parseInt(d_to)) {
     Toast.fire({ icon: 'error', title: 'Invalid date range.' })
     return
   }
 
-  main.fn.chart.get_status( function(resp){
+
+  let showChart = (chart_id, month, data, text) => {
+
+    Highcharts.chart(chart_id, {
+      chart: {
+          type: 'column'
+      },
+      title: {
+          text: text
+      },
+      // subtitle: {
+      //     text: 'Source: WorldClimate.com'
+      // },
+      xAxis: {
+          categories: month,
+          crosshair: true
+      },
+      yAxis: {
+          min: 0,
+          title: {
+              text: 'Number of PR Requests'
+          }
+      },
+      // tooltip: {
+      //     headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+      //     pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+      //         '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+      //     footerFormat: '</table>',
+      //     shared: true,
+      //     useHTML: true
+      // },
+      plotOptions: {
+          column: {
+              pointPadding: 0.2,
+              borderWidth: 0
+          }
+      },
+      series: data
+  });
+
+
+  }
+
+
+  main.fn.chart.get_report('isr' , function(resp) {
+    
     // console.table(resp)
 
-    let get_months = resp.map(v => v.month);
-    let get_approved = resp.map(v => v.approved)
-    let get_issued = resp.map(v => v.issued)
-    let get_ongoing = resp.map(v => v.ongoing)
-    let get_disapproved = resp.map(v => v.disapproved)
-    let get_cancelled = resp.map(v => v.cancelled)
+    let name = ['Requests', 'Approved within Leadtime', 'Expired (Lapsed Requests)']
 
-    // console.log({get_approved})
-    // console.log({get_issued})
-    // console.log({get_ongoing})
-    // console.log({get_disapproved})
-    // console.log({get_cancelled})
-    // console.log({get_months})
+    let getMonth = resp.map(v => v.month)
+    let getRequest = resp.map(v => parseInt(v.docs_request))
+    let getApproved = resp.map(v => parseInt(v.approved_w_lt))
+    let getExpired = resp.map(v => parseInt(v.expired))
 
-    let chartStatus = Chart.getChart("barChartSummary"); // <canvas> id
-    if (chartStatus != undefined) {
-      chartStatus.destroy();
-    }
-   
-    var ctx = document.getElementById("barChartSummary").getContext("2d");
+    let getData = [getRequest, getApproved, getExpired]
 
-    var data = {
-        labels: get_months,
-        datasets: [
-            {
-                label: "Approved",
-                backgroundColor: "rgba(75, 192, 192, 0.2)",
-                borderColor: "rgb(75, 192, 192)",
-                borderWidth: 1,
-                data: get_approved
-            },
-            {
-                label: "Issued",
-                backgroundColor: "rgba(153, 102, 255, 0.2)",
-                borderColor: "rgb(153, 102, 255)",
-                borderWidth: 1,
-                data: get_issued
-            },
-            {
-                label: "Ongoing",
-                backgroundColor: "rgba(255, 205, 86, 0.2)",
-                borderColor: "rgb(255, 205, 86)",
-                borderWidth: 1,
-                data: get_ongoing
-            },
-            {
-                label: "Disapproved",
-                backgroundColor: "rgba(255, 99, 132, 0.2)",
-                borderColor: "rgb(255, 99, 132)",
-                borderWidth: 1,
-                data: get_disapproved
-            },
-            {
-              label: "Cancelled",
-              backgroundColor: "rgba(255, 159, 64, 0.2)",
-              borderColor: "rgb(255, 159, 64)",
-              borderWidth: 1,
-              data: get_cancelled
-            },
-        ]
-    };
+    let reformattedData = getData.map( (v, i) => {
+      return ({
+        name: name[i],
+        data: v
+      })
+    })
 
-    myBarChart = new Chart(ctx, {
-        type: 'bar',
-        data: data,
-        options: {
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        },
-    });
+    // console.log({reformattedData})
 
-    $("#status_tbl").DataTable().draw();
-    $("#status_by_name_tbl").DataTable().draw();
+    showChart('isr', getMonth, reformattedData, 'Overall Summary report: Leadtime Approval Summary')
+
+
   })
+  
+
+  main.fn.chart.get_report('ps' , function(resp) {
+    
+    // console.table(resp)
+
+    let name = ['Approved PRs', 'Issued PRs', 'Pending PRs', 'Rejecte PRs']
+
+    let getMonth = resp.map(v => v.month)
+    let getApproved = resp.map(v => parseInt(v.approved))
+    let getIssued = resp.map(v => parseInt(v.issued))
+    let getPending = resp.map(v => parseInt(v.pending))
+    let getRejected = resp.map(v => parseInt(v.rejected))
+
+    let getData = [getApproved, getIssued, getPending, getRejected]
+
+    let reformattedData = getData.map( (v, i) => {
+      return ({
+        name: name[i],
+        data: v
+      })
+    })
+
+    showChart('ps', getMonth, reformattedData, 'Processing Summary')
+
+
+  })
+
+
+
+
+})
+
+
+// old report
+// .off('click', '.search_data').on('click', '.search_data', function(){
+
+//   const { d_from, d_to, d_year} = main.fn.filter.get_status()
+
+//   if(d_from == '' || d_to == '' || d_year == '') {
+//     Toast.fire({ icon: 'error', title: 'Please fill all required fields.' }) 
+//     return
+//   }
+
+//   // console.log({d_from})
+//   // console.log({d_to})
+//   // console.log('d_from > d_to', d_from > d_to)
+
+//   if(parseInt(d_from) > parseInt(d_to)) {
+//     Toast.fire({ icon: 'error', title: 'Invalid date range.' })
+//     return
+//   }
+
+//   main.fn.chart.get_status( function(resp){
+//     // console.table(resp)
+
+//     let get_months = resp.map(v => v.month);
+//     let get_approved = resp.map(v => v.approved)
+//     let get_issued = resp.map(v => v.issued)
+//     let get_ongoing = resp.map(v => v.ongoing)
+//     let get_disapproved = resp.map(v => v.disapproved)
+//     let get_cancelled = resp.map(v => v.cancelled)
+
+//     // console.log({get_approved})
+//     // console.log({get_issued})
+//     // console.log({get_ongoing})
+//     // console.log({get_disapproved})
+//     // console.log({get_cancelled})
+//     // console.log({get_months})
+
+//     let chartStatus = Chart.getChart("barChartSummary"); // <canvas> id
+//     if (chartStatus != undefined) {
+//       chartStatus.destroy();
+//     }
+   
+//     var ctx = document.getElementById("barChartSummary").getContext("2d");
+
+//     var data = {
+//         labels: get_months,
+//         datasets: [
+//             {
+//                 label: "Approved",
+//                 backgroundColor: "rgba(75, 192, 192, 0.2)",
+//                 borderColor: "rgb(75, 192, 192)",
+//                 borderWidth: 1,
+//                 data: get_approved
+//             },
+//             {
+//                 label: "Issued",
+//                 backgroundColor: "rgba(153, 102, 255, 0.2)",
+//                 borderColor: "rgb(153, 102, 255)",
+//                 borderWidth: 1,
+//                 data: get_issued
+//             },
+//             {
+//                 label: "Pending",
+//                 backgroundColor: "rgba(255, 205, 86, 0.2)",
+//                 borderColor: "rgb(255, 205, 86)",
+//                 borderWidth: 1,
+//                 data: get_ongoing
+//             },
+//             {
+//                 label: "Disapproved",
+//                 backgroundColor: "rgba(255, 99, 132, 0.2)",
+//                 borderColor: "rgb(255, 99, 132)",
+//                 borderWidth: 1,
+//                 data: get_disapproved
+//             },
+//             {
+//               label: "Cancelled",
+//               backgroundColor: "rgba(255, 159, 64, 0.2)",
+//               borderColor: "rgb(255, 159, 64)",
+//               borderWidth: 1,
+//               data: get_cancelled
+//             },
+//         ]
+//     };
+
+//     myBarChart = new Chart(ctx, {
+//         type: 'bar',
+//         data: data,
+//         options: {
+//           scales: {
+//             y: {
+//               beginAtZero: true
+//             }
+//           }
+//         },
+//     });
+
+//     $("#status_tbl").DataTable().draw();
+//     $("#status_by_name_tbl").DataTable().draw();
+//   })
 
  
 
 
-})
+// })
 
 
 

@@ -2,6 +2,7 @@ app.log.check_session()
 
 let uid = app.cookie.get('uid');
 
+
 const main = {
   fn: {
     chart : {
@@ -13,47 +14,98 @@ const main = {
               };
               app.crud.request('sp-get_form_summary_count', params, function (resp) {
 
-                
-
                 if(resp.length != 0){
                     $('.no-data-yet').hide();
-                    let form_count = resp.map(v => v.f_count)
-                    let form_name = resp.map(v => v.form)
+                    let form_count = resp.map(v => parseInt(v.f_count))
+                    // let form_name = resp.map(v => v.form)
     
                     // console.log({resp})
                     // console.log({form_count})
                     // console.log({form_name})
-    
-                    let ctx = document.getElementById("form_summary");
-                    ctx.height = 150;
-                    let myChart = new Chart(ctx, {
-                        type: 'pie',
-                        data: {
-                            datasets: [{
-                                data: form_count,
-                                backgroundColor: [
-                                    "#03254c",
-                                    "#1167b1",
-                                    "#187bcd",
-                                    "#2a9df4",
-                                    "#d0efff"
-                                ],
-                                hoverBackgroundColor: [
-                                    "#03254c",
-                                    "#1167b1",
-                                    "#187bcd",
-                                    "#2a9df4",
-                                    "#d0efff"
-                                ],
-    
-                            }],
-                            labels: form_name
+
+
+                    let getTotalCount = form_count.reduce((a,b) => {
+                        return a + b
+                    } )
+
+                    let reformattedData = resp.map( v => {
+                        return ({
+                            name : v.form,
+                            y : parseInt(((v.f_count / getTotalCount) * 100).toFixed(2)) // get percentage with 2 decimal then return number datatype
+                        })
+                    })
+
+                    // console.log({getTotalCount})
+                    // console.log({reformattedData})
+
+                    // Build the chart
+                    Highcharts.chart('container', {
+                        chart: {
+                            plotBackgroundColor: null,
+                            plotBorderWidth: null,
+                            plotShadow: false,
+                            type: 'pie'
                         },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: true,
-                        }
+                        title: {
+                            text: 'My Document Request'
+                        },
+                        tooltip: {
+                            pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                        },
+                        accessibility: {
+                            point: {
+                                valueSuffix: '%'
+                            }
+                        },
+                        plotOptions: {
+                            pie: {
+                                allowPointSelect: true,
+                                cursor: 'pointer',
+                                dataLabels: {
+                                    enabled: true,
+                                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                                    connectorColor: 'silver'
+                                },
+                                showInLegend: true
+                            }
+                        },
+                        series: [{
+                            name: 'Percentage',
+                            colorByPoint: true,
+                            data: reformattedData
+                        }]
                     });
+
+                    // let ctx = document.getElementById("form_summary");
+                    // ctx.height = 150;
+                    // let myChart = new Chart(ctx, {
+                    //     type: 'pie',
+                    //     data: {
+                    //         datasets: [{
+                    //             data: form_count,
+                    //             backgroundColor: [
+                    //                 "#03254c",
+                    //                 "#1167b1",
+                    //                 "#187bcd",
+                    //                 "#2a9df4",
+                    //                 "#d0efff"
+                    //             ],
+                    //             hoverBackgroundColor: [
+                    //                 "#03254c",
+                    //                 "#1167b1",
+                    //                 "#187bcd",
+                    //                 "#2a9df4",
+                    //                 "#d0efff"
+                    //             ],
+    
+                    //         }],
+                    //         labels: form_name
+                    //     },
+                    //     options: {
+                    //         responsive: true,
+                    //         maintainAspectRatio: true,
+                    //     }
+                    // });
                     return
                 } else {
                     $('.custom-pie-container').hide()
@@ -184,7 +236,7 @@ const main = {
                       $( row ).find('td:eq(-1) > div > a')
                           .attr({
                               'data-tbl_id': data.tbl_id,
-                              'data-docs_status': 'Ongoing',
+                              'data-docs_status': 'Pending',
                               'data-trans_no': data.trans_no,
                       });
         
@@ -193,7 +245,7 @@ const main = {
         
                   switch(data.docs_status){
                       case '0':
-                          stat = '<span class="label label-sm gradient-4">Ongoing</span>';
+                          stat = '<span class="label label-sm gradient-4">Pending</span>';
                           break;
                       case '1':
                           stat = '<span class="label label-sm gradient-1">Approved</span>';
@@ -449,10 +501,28 @@ $(document)
         let d = resp[0]
         // console.log({d})
     
-        let approver = d.approver_list.split(',')
+        let approver = d.approver_list.split('|')
     
         let approver_list = approver.map((v,i) => {
-            return(`<div>${v}</div>`)
+
+            // console.log(v)
+            // console.log(v.search(/\bPending\b/) >= 0)
+
+            let textColor;
+
+            if(v.search(/\bPending\b/) >= 0) {
+                textColor = 'badge-warning'
+            } else if(v.search(/\bApproved\b/) >= 0) {
+                textColor = 'badge-success'
+            } else if(v.search(/\bDisapproved\b/) >= 0) {
+                textColor = 'badge-danger'
+            } else {
+                console.log({textColor})
+            }
+            
+
+
+            return(`<div class="m-1 custom-badge ${textColor}" style="font-size: 14px">${v}</div>`)
         }) 
 
         // if not null
