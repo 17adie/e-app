@@ -1,6 +1,8 @@
 app.log.check_session()
 
 let uid = app.cookie.get('uid');
+let _utype = app.cookie.get("utype");
+
 let issued_by;
 let myBarChart;
 
@@ -264,19 +266,54 @@ const main = {
                   </a>`
                   )
 
-                  // exclude process in normal user but notified.
-                  let _utype = app.cookie.get("utype");
+ 
+                  let html_action = () => {
 
-                  $( row ).find('td:eq(-1)')
-                  .html(_utype == 'user_np' ? data.docs_status == 1 ?  data.issued_tag == 1 ?
-                  `<span class="label label-sm label-success">Processed</span>` :
-                  `<a href="javascript:void(0)" class="custom_action_icon_btn process_document text-success" data-form="${data.form}" data-document_title="${data.document_title}" data-email="${data.email}" data-requestor="${data.requestor}" data-docs_status="${data.docs_status}" data-tbl_id="${data.tbl_id}"  data-trans_no="${data.trans_no}" data-toggle="tooltip" data-placement="top" title="Process" data-original-title="Process">
-                    <i class="fa fa-send"></i>
-                  </a>` : 
-                  `<div href="javascript:void(0)" class="custom_action_icon_btn text-muted">
-                    <i class="fa fa-send"></i>
-                  </div>` : 'N/A'
-                  )
+                    // none notified personnel
+                    if(_utype != 'user_np') return 'N/A'
+
+                    // processed
+                    if(_utype == 'user_np' && data.docs_status == 1 && data.issued_tag == 1) return '<span class="label label-sm label-success">Processed</span>'
+                    
+                    // rejected
+                    if(_utype == 'user_np' && data.docs_status == 1 && data.rejected_tag == 1) return '<span class="label label-sm label-danger">Rejected</span>'
+                    
+                    // process and reject buttons
+                    if(_utype =='user_np' && data.docs_status == 1) return `
+                      <a href="javascript:void(0)" class="custom_action_icon_btn process_document text-success" data-pr_tag="1" data-form="${data.form}" data-document_title="${data.document_title}" data-email="${data.email}" data-requestor="${data.requestor}" data-docs_status="${data.docs_status}" data-tbl_id="${data.tbl_id}"  data-trans_no="${data.trans_no}" data-toggle="tooltip" data-placement="top" title="Process" data-original-title="Process">
+                        <i class="fa fa-check"></i>
+                      </a>
+                      <a href="javascript:void(0)" class="custom_action_icon_btn process_document text-danger" data-pr_tag="2" data-form="${data.form}" data-document_title="${data.document_title}" data-email="${data.email}" data-requestor="${data.requestor}" data-docs_status="${data.docs_status}" data-tbl_id="${data.tbl_id}"  data-trans_no="${data.trans_no}" data-toggle="tooltip" data-placement="top" title="Reject" data-original-title="Reject">
+                        <i class="fa fa-close"></i>
+                      </a>`
+
+                    // muted check for pending, disapproved, cancelled status
+                    if(_utype == 'user_np' && data.docs_status != 1) return `
+                      <div href="javascript:void(0)" class="custom_action_icon_btn text-muted">
+                        <i class="fa fa-check"></i>
+                      </div`
+
+                  }
+
+                   $( row ).find('td:eq(-1)').html(html_action())
+
+                  // // exclude process in normal user but notified.
+                  // let _utype = app.cookie.get("utype");
+
+                  // $( row ).find('td:eq(-1)')
+                  // .html(_utype == 'user_np' ? data.docs_status == 1 ?  data.issued_tag == 1 ?
+                  // `<span class="label label-sm label-success">Processed</span>` :
+                  // `<a href="javascript:void(0)" class="custom_action_icon_btn process_document text-success" data-form="${data.form}" data-document_title="${data.document_title}" data-email="${data.email}" data-requestor="${data.requestor}" data-docs_status="${data.docs_status}" data-tbl_id="${data.tbl_id}"  data-trans_no="${data.trans_no}" data-toggle="tooltip" data-placement="top" title="Process" data-original-title="Process">
+                  //   <i class="fa fa-check"></i>
+                  // </a>
+                  // <a href="javascript:void(0)" class="custom_action_icon_btn process_document text-danger" data-form="${data.form}" data-document_title="${data.document_title}" data-email="${data.email}" data-requestor="${data.requestor}" data-docs_status="${data.docs_status}" data-tbl_id="${data.tbl_id}"  data-trans_no="${data.trans_no}" data-toggle="tooltip" data-placement="top" title="Reject" data-original-title="Reject">
+                  //   <i class="fa fa-close"></i>
+                  // </a>
+                  // ` : 
+                  // `<div href="javascript:void(0)" class="custom_action_icon_btn text-muted">
+                  //   <i class="fa fa-check"></i>
+                  // </div>` : 'N/A'
+                  // )
                       
                   $(row).addClass('hover_cls');
 
@@ -1051,18 +1088,19 @@ get_status_by_name: function() {
       return cb(resp)
     })
   },
-  update_process_document: function(tbl_id, process_remarks, cb) {
+  update_process_document: function(tbl_id, process_remarks, type, cb) {
     const params = {
       _tbl_id: tbl_id,
       _uid: uid,
-      _process_remarks: process_remarks
+      _process_remarks: process_remarks,
+      _type: type
     };
     app.crud.request('sp-update_process_document', params, function (resp) {
       return cb(resp)
     })
   },
   check_user_type: function(){
-    let _utype = app.cookie.get("utype");
+    // let _utype = app.cookie.get("utype");
 
     if(_utype == 'user_np') {
       // console.log({_utype})
@@ -1228,7 +1266,7 @@ $(document)
 })
 
 .off('click', '.process_document').on('click', '.process_document', function(){
-  let {tbl_id , docs_status, trans_no, requestor, email, document_title, form} = $(this).data()
+  let {tbl_id , docs_status, trans_no, requestor, email, document_title, form, pr_tag} = $(this).data()
   let email_to = email.split() // convert to array for global notification
   let text = `<small>Trans #: </small> ${trans_no} <br> <small>Requestor: </small> ${requestor}`
 
@@ -1237,6 +1275,7 @@ $(document)
   // console.log({tbl_id})
   // console.log({docs_status})
   // console.log({email_to})
+  console.log({pr_tag})
 
   main.fn.get_process_tag(tbl_id, function(resp){
     let ptag = resp[0].process_tag
@@ -1248,46 +1287,101 @@ $(document)
       return
     }
 
-    Swal.fire({
-      title:"Are you sure you want to process this document?",
-      html: text,
-      input: 'text',
-      inputPlaceholder: 'Enter Remarks (optional)',
-      icon:'question',
-      showCancelButton: true,
-      confirmButtonText: 'Yes!',
-      showLoaderOnConfirm: true,
-      allowEscapeKey: false,
-      allowOutsideClick: false,
-      preConfirm: (process_remarks) => {
-      console.log(process_remarks)
-     
-        return new Promise((resolve, reject) => { // for sweetalert loader ..
-            main.fn.update_process_document(tbl_id, process_remarks, function(resp){
-              app.email_notification({ // notification for notifed person
-                doc_title : document_title,  
-                issued_by: issued_by,
-                email_to : email_to, 
-                trans_no : trans_no,
-                form_name : form,
-                process_remarks: process_remarks == '' ? 'N/A' : process_remarks,
-                file_name: 'email_notification_process'}, function(resp){
-                console.log('pre pros', {resp})
-                return resolve(resp)
+    if(pr_tag == 1) {
+
+      Swal.fire({
+        title:"Are you sure you want to process this document?",
+        html: text,
+        input: 'text',
+        inputPlaceholder: 'Enter Remarks (optional)',
+        icon:'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes!',
+        showLoaderOnConfirm: true,
+        allowEscapeKey: false,
+        allowOutsideClick: false,
+        preConfirm: (process_remarks) => {
+        console.log(process_remarks)
+       
+          return new Promise((resolve, reject) => { // for sweetalert loader ..
+              main.fn.update_process_document(tbl_id, process_remarks, 1, function(resp){
+                app.email_notification({ // notification for notifed person
+                  doc_title : document_title,  
+                  issued_by: issued_by,
+                  email_to : email_to, 
+                  trans_no : trans_no,
+                  form_name : form,
+                  process_remarks: process_remarks == '' ? 'N/A' : process_remarks,
+                  file_name: 'email_notification_process'}, function(resp){
+                  console.log('pre pros', {resp})
+                  return resolve(resp)
+                })
+                
               })
-              
-            })
+      
+          }).catch(err => { console.log(err) });
+           
+        },
+      }).then((result) => {
+        if (result.isConfirmed) {
+          $("#notification_tbl").DataTable().draw();
+          Toast.fire({ icon: 'success', title: 'Document notification sent successfully' })
+        }
     
-        }).catch(err => { console.log(err) });
-         
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        $("#notification_tbl").DataTable().draw();
-        Toast.fire({ icon: 'success', title: 'Document notification sent successfully' })
-      }
-  
-    })
+      })
+
+    } else if(pr_tag == 2) {
+
+
+      Swal.fire({
+        title:"Are you sure you want to reject this document?",
+        html: text,
+        input: 'text',
+        inputPlaceholder: 'Enter Remarks (optional)',
+        icon:'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes!',
+        showLoaderOnConfirm: true,
+        allowEscapeKey: false,
+        allowOutsideClick: false,
+        preConfirm: (process_remarks) => {
+        console.log(process_remarks)
+       
+          return new Promise((resolve, reject) => { // for sweetalert loader ..
+              main.fn.update_process_document(tbl_id, process_remarks, 2, function(resp){
+                app.email_notification({ // notification for notifed person
+                  doc_title : document_title,  
+                  issued_by: issued_by,
+                  email_to : email_to, 
+                  trans_no : trans_no,
+                  form_name : form,
+                  process_remarks: process_remarks == '' ? 'N/A' : process_remarks,
+                  file_name: 'email_notification_reject'}, function(resp){
+                  console.log('pre pros', {resp})
+                  return resolve(resp)
+                })
+                
+              })
+      
+          }).catch(err => { console.log(err) });
+           
+        },
+      }).then((result) => {
+        if (result.isConfirmed) {
+          $("#notification_tbl").DataTable().draw();
+          Toast.fire({ icon: 'success', title: 'Document notification sent successfully' })
+        }
+    
+      })
+
+
+
+
+    } else {
+      console.log('error tag', pr_tag)
+    }
+
+
     
   })
 

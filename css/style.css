@@ -14833,8 +14833,8 @@ div.no-data-yet i {
 
 .custom-pie-container {
   position: relative;
-  height: 45vh;
-  width: 45vh;
+  height: 55vh;
+  /* width: 45vh; */
   padding-left: 0;
   padding-right: 0;
   margin-left: auto;
