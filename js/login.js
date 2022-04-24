@@ -35,7 +35,7 @@ $(document)
      if(auth_resp == 1) {
       app.cookie.set(d.tbl_id, d.type, function(){
         if(d.type == 'admin') {
-          window.location.href = 'views/admin_page.html';
+          window.location.href = 'views/admin_user_access.html';
         } else {
           window.location.href = 'views/dashboard.html';
         }

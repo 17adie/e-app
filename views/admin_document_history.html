@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>E-App Admin</title>
+  <link rel="icon" type="image/png" sizes="16x16" href="../images/favicon.png">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.1.9/sweetalert2.min.css" integrity="sha512-cyIcYOviYhF0bHIhzXWJQ/7xnaBuIIOecYoPZBgJHQKFPo+TOBA+BY1EnTpmM8yKDU4ZdI3UGccNGCEUdfbBqw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link href="../css/style.css" rel="stylesheet"> 
+  <script src="../js/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+ 
+
+  <div id="preloader">
+    <div class="loader">
+        <svg class="circular" viewBox="25 25 50 50">
+            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="3" stroke-miterlimit="10" />
+        </svg>
+    </div>
+  </div>
+
+  <div id="main-wrapper">
+    <!-- <div id="sidebar"></div> -->
+    <div id="admin_navigator"></div>
+
+    <div class="content-body">
+        <h4 class="ml-3 mt-3">View Document History</h4>
+
+        <div class="container-fluid mt-3">
+           
+            <div class="card">
+                <h5 class="card-header custom-card-header">
+                    Document History
+                  </h5>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table header-border" id="document_history_tbl">
+                            
+                        </table>
+                    </div>
+                </div>
+            </div>
+    
+        </div>
+
+        <!-- NOTIFICATION MODAL -->
+				<div id="modal-view_details" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false" >
+          <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h5 class="modal-title">Request Summary</h5>
+                      <span class="label label-sm txt_document_status"></span>
+                  </div>
+                  <div class="modal-body">
+                      <div class="container">
+                          <h5>Request Details</h5>
+                          <div class="custom-list-group">
+                              <ul class="list-group list-group-flush">
+                                  <li class="list-group-item">
+                                      <div class="row">
+                                          <div class="col-5 label">Transaction #:</div>
+                                          <div class="col-7 txt_trans_no"></div>
+                                      </div>
+                                  </li>
+                                  <li class="list-group-item">
+                                      <div class="row">
+                                          <div class="col-5 label">Document:</div>
+                                          <div class="col-7 txt_category"></div>
+                                      </div>
+                                  </li>
+                                  <li class="list-group-item">
+                                      <div class="row">
+                                          <div class="col-5 label">Requestor:</div>
+                                          <div class="col-7 txt_requestor"></div>
+                                      </div>
+                                  </li>
+                                  <li class="list-group-item">
+                                      <div class="row">
+                                          <div class="col-5 label">Subject:</div>
+                                          <div class="col-7 txt_document_title"></div>
+                                      </div>
+                                  </li>
+                                  <li class="list-group-item">
+                                      <div class="row">
+                                          <div class="col-5 label">Message:</div>
+                                          <div class="col-7 txt_requestor_message"></div>
+                                      </div>
+                                  </li>
+                                  <li class="list-group-item">
+                                      <div class="row">
+                                          <div class="col-5 label">Date Requested:</div>
+                                          <div class="col-7 txt_date_request"></div>
+                                      </div>
+                                  </li>
+                                  <!-- <li class="list-group-item">
+                                      <div class="row">
+                                          <div class="col-5 label">Date Approved:</div>
+                                          <div class="col-7 txt_date_approved"></div>
+                                      </div>
+                                  </li> 
+                                  <li class="list-group-item">
+                                      <div class="row">
+                                          <div class="col-5 label">Approved By:</div>
+                                          <div class="col-7 txt_approved_by"></div>
+                                      </div>
+                                  </li> -->
+                                  <li class="list-group-item">
+                                      <div class="row">
+                                          <div class="col-5 label">Approver List</div>
+                                          <div class="col-7 txt_approver_list"></div>
+                                      </div>
+                                  </li>
+                                  <li class="list-group-item">
+                                      <div class="row">
+                                          <div class="col-5 label">Notified Person(s)</div>
+                                          <div class="col-7 txt_notified_person_list"></div>
+                                      </div>
+                                  </li>
+                                  <li class="list-group-item">
+                                      <div class="row">
+                                          <div class="col-5 label">Disapproved Remarks</div>
+                                          <div class="col-7 txt_disapproved_remarks"></div>
+                                      </div>
+                                  </li>
+                                </ul>
+                          </div>
+                          <h5>Attachments</h5>
+                          <div class="custom-list-group">
+                              <ul class="list-group list-group-flush">
+                                  <li class="list-group-item">
+                                      <div class="row">
+                                          <div class="col-5 label">Main Attachment:</div>
+                                          <div class="col-7 file_main_attch"></div>
+                                      </div>
+                                  </li>
+                                  <li class="list-group-item">
+                                      <div class="row">
+                                          <div class="col-5 label">Supporting Attachment:</div>
+                                          <div class="col-7 file_sup_attch"></div>
+                                      </div>
+                                  </li>
+                                </ul>
+                          </div>
+                         
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+
+    </div>
+  </div>
+
+
+
+
+  <div class="footer">
+    <div class="copyright">
+        <p>E-APPROVAL</p>
+    </div>
+  </div>
+  
+
+  <script type="text/javascript">
+    $(document).ready( function () {
+        $("#admin_navigator").load("admin_navigator.html");
+    });
+  </script>
+
+  <script src="../plugins/common/common.min.js"></script>
+  <script src="../js/custom.min.js"></script>
+  <script src="../js/settings.js"></script>
+  <script src="../js/gleek.js"></script>
+  <script src="../js/styleSwitcher.js"></script>
+  <!-- <script src="../js/js.cookie.min.js"></script> -->
+  <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js"></script>
+  <script src="../js/moment.min.js"></script>
+  <script src="../js/moment-business-days.js"></script>
+
+  <!-- EXPORTING DATA SCRI -->
+  <script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+  <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
+
+  <script src="../js/app.js"></script>
+  <script src="../js/controllers/admin/document_history.js"></script>
+
+</body>
+</html>

@@ -342,7 +342,7 @@ const main = {
                   app.view_table.request('sp-get_document_request', params, function (response) {
                     
                       let resp = response.data || [];
-                    // console.log(resp)
+                    console.log({response})
                      
                       if (data.draw === 1) { // if this is the first draw, which means it is unfiltered
                           unfiltered_rows_count = response._total_count;

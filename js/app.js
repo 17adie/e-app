@@ -162,7 +162,7 @@ const app = {
             let uid = app.cookie.get("uid")
 
             if(uid == 1) {
-                window.location.href = 'views/admin_page.html';
+                window.location.href = 'views/admin_user_access.html';
                 return
             }
 

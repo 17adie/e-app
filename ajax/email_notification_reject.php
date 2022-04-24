@@ -37,7 +37,7 @@ if( isset($_POST['data']) ) {
   $date_today = date("Y-m-d h:i:sa");
   
   $mes = "Greetings! <br><br>" .
-         "There has been an update with regards to the proccessing of your document request. <br><br>" . 
+         "Please be informed that one of the documents that you've requested has been rejected. <br><br>" . 
          "Issued by: <strong>" . $issued_by . "</strong><br>" . 
          "Document Transaction ID: <strong>" . $trans_no . "</strong><br>" . 
          "Document: <strong>" . $form . "</strong><br>" . 
@@ -60,7 +60,7 @@ if( isset($_POST['data']) ) {
 
     $mail->isHTML(true);                                  //Set email format to HTML
     $mail->setFrom(EMAIL, 'E-APP NOTIFICATION');
-    $mail->Subject = "E-Approval Document Processing Update: Document Rejected";
+    $mail->Subject = "E-Approval Document Processing Update: " . $subject;
     $mail->Body    = $mes;
 
     
