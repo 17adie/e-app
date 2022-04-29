@@ -1,5 +1,30 @@
 <?php
 
+function get_user_details($tbl_id){
+
+  $query = "SELECT
+              tbl_id,
+              first_name,
+              last_name,
+              username,
+              email,
+              `status`
+            FROM user_tbl WHERE tbl_id = :tbl_id LIMIT 1
+            ";
+
+  try{
+    $db = getConnection();
+    $statement = $db->prepare($query);
+    $statement->bindParam(':tbl_id', $tbl_id);
+    $statement->execute();
+    $response = $statement->fetchAll(PDO::FETCH_OBJ);
+    return $response;
+  } catch(PDOException $e){
+    echo '{"error":{"text" ' . __FUNCTION__ . ':' . $e->getMessage() . '}}';
+  }
+
+}
+
 function get_users($offset, $search, $sort_by, $sort_direction){
 
   $query = "SELECT
@@ -7,7 +32,8 @@ function get_users($offset, $search, $sort_by, $sort_direction){
               first_name,
               last_name,
               username,
-              email
+              email,
+              `status`
             FROM user_tbl
             WHERE
               CASE WHEN :search IS NULL OR :search = '' THEN
@@ -26,6 +52,7 @@ function get_users($offset, $search, $sort_by, $sort_direction){
                   WHEN 'last_name' THEN last_name
                   WHEN 'username' THEN username
                   WHEN 'email' THEN email
+                  WHEN 'status' THEN `status`
                   END
               END ASC,
               CASE WHEN :sort_direction = 'desc'
@@ -36,6 +63,7 @@ function get_users($offset, $search, $sort_by, $sort_direction){
                   WHEN 'last_name' THEN last_name
                   WHEN 'username' THEN username
                   WHEN 'email' THEN email
+                  WHEN 'status' THEN `status`
                   END
               END DESC
             LIMIT 10 OFFSET :offset
@@ -83,6 +111,27 @@ function get_users_count($search){
   } catch(PDOException $e){
     echo '{"error":{"text" ' . __FUNCTION__ . ':' . $e->getMessage() . '}}';
   }
+
+}
+
+
+function update_user_status($tbl_id, $stat){
+
+  $query = "UPDATE user_tbl SET `status` = :stat WHERE tbl_id = :tbl_id
+          ";
+  try{
+    $db = getConnection();
+    $statement = $db->prepare($query);
+    $statement->execute(
+      array(
+        ":tbl_id" => $tbl_id,
+        ":stat" => $stat
+        )
+    );
+  } catch(PDOException $e){
+    echo '{"error":{"text" ' . __FUNCTION__ . ':' . $e->getMessage() . '}}';
+  }
+
 
 }
 

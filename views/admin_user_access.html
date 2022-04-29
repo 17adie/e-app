@@ -44,7 +44,48 @@
                     </div>
                 </div>
             </div>
+            <!-- CARD END -->
     
+
+            <!-- EDIT USER MODAL -->
+            <div id="modal-edit_user_details" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false" >
+              <div class="modal-dialog modal-lg">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <h5 class="modal-title">Edit User</h5>
+                          <span class="label label-sm user_status"></span>
+                      </div>
+                      <div class="modal-body">
+                          <div class="container">
+                            
+                            <div class="form-group">
+                              <label for="username">Username</label>
+                              <input type="text" class="form-control" id="username" disabled>
+                            </div>
+                            <div class="form-group">
+                              <label for="first_name">First Name</label>
+                              <input type="text" class="form-control" id="first_name" placeholder="Enter First Name">
+                            </div>
+                            <div class="form-group">
+                              <label for="last_name">First Name</label>
+                              <input type="text" class="form-control" id="last_name" placeholder="Enter Last Name">
+                            </div>
+                            <div class="form-group">
+                              <label for="user_email">email</label>
+                              <input type="email" class="form-control" id="user_email" placeholder="Enter Email">
+                            </div>
+
+                          </div>
+                      </div>
+                      <div class="modal-footer">
+                          <button type="button" class="btn btn-default btn-primary" id="update_user">Save</button>
+                          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                      </div>
+                  </div>
+              </div>
+            </div>
+          <!-- MODAL END -->
+
         </div>
     </div>
   </div>
