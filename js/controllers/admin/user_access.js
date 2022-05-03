@@ -23,6 +23,22 @@ const main = {
     }
     });
   },
+  add: {
+    user: function(fname, lname, uname, email, pw, type, cb){
+      const params = {
+        first_name: fname,
+        last_name: lname,
+        username: uname,
+        email: email,
+        password: pw,
+        type: type,
+      }
+      console.log({params})
+      main.api_request('add_new_user', params, function(resp){
+        return cb(resp)
+      })
+    }
+  },
   update: {
     user_status: function(tbl_id, stat, cb){
       const params = {
@@ -106,6 +122,7 @@ const main = {
               columns: columns,
               order: [ 0, "asc" ],  
               columnDefs: [
+                { type: 'any-number', targets : 0 },
                 {
                     render: function ( data, type, row ) {
                         return row.tbl_id;
@@ -120,7 +137,7 @@ const main = {
                       return userStatus;
                   },
                   targets: -2
-              },
+                },
             ],
              
               ajax: function (data, callback, settings) {
@@ -132,7 +149,7 @@ const main = {
                       _sort_direction: data.order[0].dir,
                   };
                   main.api_request('get_users', params, function(response){
-                      // console.log({response})
+                      console.log({response})
                       let resp = response.data || [];
                       
                       if (data.draw === 1) { // if this is the first draw, which means it is unfiltered
@@ -186,7 +203,34 @@ const main = {
           });
 
     }
-  }
+  },
+  reset: function(el){
+    el
+      .find("input").val('').removeClass('input-custom-error').end()
+      .find("select").val('').removeClass('input-custom-error').end()
+  },
+  validate_inputs: function(username, password, email, cb){
+
+    let validatePassword = password.match(/(?=.*\d)(?=.*[a-zA-Z]).{8,}/);
+    let validateEmail = email.match(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)
+
+    if(username.length < 6){
+      Toast.fire({ icon: 'error', title: 'Username must be at least 6 character'})
+      return cb(false)
+    }
+
+    if(!validatePassword) {
+      Toast.fire({ icon: 'error', title: 'Password must be at least 8 characters and alphanumeric'})
+      return cb(false)
+    }
+    
+    if(!validateEmail) {
+      Toast.fire({ icon: 'error', title: 'Invalid email format'})
+      return cb(false)
+    }
+    
+    return cb(true)
+  },
 
 }
 
@@ -226,6 +270,56 @@ $(document)
 })
 
 .off('click', '#add_user').on('click', '#add_user', function(){
+
+  let first_name = document.getElementById('add_first_name').value.trim(),
+      last_name = document.getElementById('add_last_name').value.trim(),
+      username = document.getElementById('add_username').value.trim(),
+      email = document.getElementById('add_user_email').value.trim(),
+      password = document.getElementById('add_password').value.trim(),
+      type = document.getElementById('add_usertype').value
+  
+  if(app.validate_input($('#modal-add_user'))){
+
+    main.validate_inputs(username, password, email, function(resp){
+      if(resp) {
+        main.add.user(first_name, last_name, username, email, password, type, function(resp){
+          console.log(resp)
+          console.log(resp.status)
+
+          if(resp.status == true) {
+            $('#modal-add_user').modal('hide')
+            Toast.fire({ icon: 'success', title: 'User has been addedd successfully.'})
+
+          } else {
+
+            let {name, username, email } = resp
+
+            if(name.length != 0) {
+              Toast.fire({ icon: 'warning', title: 'User is already registerd'})
+              return
+            }
+            if(username.length != 0) {
+              Toast.fire({ icon: 'warning', title: 'Username is already taken'})
+              return
+            }
+            if(email.length != 0) {
+              Toast.fire({ icon: 'warning', title: 'Email is already taken'})
+              return
+            }
+       
+          }
+
+        })
+      }
+    })
+
+    
+
+
+  } else {
+    Swal.fire('Incomplete Details','Please complete all the required info marked with (*)','error')
+  }
+
 
 })
 
@@ -275,5 +369,15 @@ $(document)
   })
 
 
+})
+
+.off('focus',':input').on('focus', ':input', function(){
+  $(this).removeClass('input-custom-error')
+})
+
+
+// reset all
+$('#modal-add_user').on('hidden.bs.modal', function (e) {
+  main.reset($(this))
 })
 

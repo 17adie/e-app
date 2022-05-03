@@ -15,6 +15,37 @@ let Toast = Swal.mixin({
 
 const app = {
 
+    validate_input: function (form) {
+        let is_valid = true
+
+        $('span.required',form).each(function(){
+            const
+                sp = $(this),
+                inp = sp.next('input[type="text"],input[type="password"],input[type="email"],select'),
+                valid = function(inp,v){
+                    if(v){
+                        inp.removeClass('input-custom-error')
+                    }else{
+                        inp.addClass('input-custom-error')
+                        is_valid = false
+                    }
+                }
+
+            // check blank/null value for text,number,email input type
+            let value = inp.val().trim()
+            if (inp.val() === '' || value.length == 0) {
+                valid(inp,0)
+            } else {
+                valid(inp,1)
+            }
+
+            
+
+        })
+
+        return is_valid
+    },
+
     email_notification: function(data, cb){
 
         // console.log('data.email_to', data.email_to.length)

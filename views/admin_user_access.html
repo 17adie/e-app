@@ -34,7 +34,7 @@
             <div class="card">
                 <h5 class="card-header custom-card-header d-flex justify-content-between">
                     <div>User List</div>
-                    <button class="btn btn-sm" id="add_user">Add User</button>
+                    <button class="btn btn-sm" id="add_new_user" data-toggle="modal" data-target="#modal-add_user">Add User</button>
                 </h5>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -86,6 +86,58 @@
             </div>
           <!-- MODAL END -->
 
+          <!-- ADD USER MODAL -->
+          <div id="modal-add_user" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false" >
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add User</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container">
+                          
+                          <div class="form-group">
+                            <label for="add_username">Username</label><span class="required"> * </span>
+                            <input type="text" class="form-control" id="add_username" aria-describedby="usernameHelp" placeholder="Enter Username">
+                            <small id="usernameHelp" class="form-text text-muted">Minimum of 6 characters</small>
+                          </div>
+                          <div class="form-group">
+                            <label for="add_password">Password</label><span class="required"> * </span>
+                            <input type="password" class="form-control" id="add_password" aria-describedby="passwordHelp" placeholder="Enter Password">
+                            <small id="passwordHelp" class="form-text text-muted">Minimun of 8 characters | Must be alphanumeric</small>
+                          </div>
+                          <div class="form-group">
+                            <label for="add_first_name">First Name</label><span class="required"> * </span>
+                            <input type="text" class="form-control" id="add_first_name" placeholder="Enter First Name">
+                          </div>
+                          <div class="form-group">
+                            <label for="add_last_name">Last Name</label><span class="required"> * </span>
+                            <input type="text" class="form-control" id="add_last_name" placeholder="Enter Last Name">
+                          </div>
+                          <div class="form-group">
+                            <label for="add_user_email">Email Address</label><span class="required"> * </span>
+                            <input type="email" class="form-control" id="add_user_email" placeholder="Enter Email">
+                          </div>
+                          <div class="form-group">
+                            <label for="add_usertype">User Typpe</label><span class="required"> * </span>
+                            <select class="custom-select" id="add_usertype">
+                              <option value="" selected>Select User Type..</option>
+                              <option value="user">Normal User</option>
+                              <option value="user_np">Notified Personnel</option>
+                            </select>
+                          </div>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" id="add_user" >Add New User</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+          </div>
+        <!-- MODAL END -->
+
         </div>
     </div>
   </div>
@@ -110,6 +162,8 @@
   <!-- <script src="../js/js.cookie.min.js"></script> -->
   <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.all.min.js"></script>
+  <!-- <script src="../js/spin.min.js"></script>
+  <script src="../js/ladda.min.js"></script> -->
   <!-- <script src="../js/moment.min.js"></script> -->
   <!-- <script src="../js/moment-business-days.js"></script> -->
 
@@ -120,6 +174,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
   <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
   <script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
+  <script src="https://cdn.datatables.net/plug-ins/1.11.5/sorting/any-number.js"></script>
+  <!-- <script src="https://cdn.datatables.net/plug-ins/1.11.5/sorting/numString.js"></script> -->
+  <!-- <script src="https://cdn.datatables.net/plug-ins/1.11.5/sorting/numeric-comma.js"></script> -->
 
   <script src="../js/app.js"></script>
   <script src="../js/controllers/admin/user_access.js"></script>

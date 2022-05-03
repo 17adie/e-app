@@ -1,5 +1,92 @@
 <?php
 
+function add_user($first_name, $last_name, $username, $password, $email, $type){
+
+  $query = "INSERT INTO user_tbl (first_name, last_name, username, `password`, email, `type`, `status`) 
+            VALUES (:first_name, :last_name, :username, :password, :email, :type, 1)
+          ";
+  try{
+    $db = getConnection();
+    $statement = $db->prepare($query);
+    $statement->execute(
+      array(
+        ":first_name" => $first_name,
+        ":last_name" => $last_name,
+        ":username" => $username,
+        ":password" => $password,
+        ":email" => $email,
+        ":type" => $type,
+        )
+    );
+  } catch(PDOException $e){
+    echo '{"error":{"text" ' . __FUNCTION__ . ':' . $e->getMessage() . '}}';
+  }
+
+
+}
+
+function check_user_duplicate_name($first_name, $last_name){
+
+  $query = "SELECT tbl_id, first_name, last_name
+            FROM user_tbl 
+            WHERE UPPER( CONCAT( TRIM(first_name),TRIM(last_name) )) = UPPER( CONCAT( TRIM(:first_name),TRIM(:last_name) )) LIMIT 1;
+            ";
+
+  try{
+    $db = getConnection();
+    $statement = $db->prepare($query);
+    $statement->bindParam(':first_name', $first_name);
+    $statement->bindParam(':last_name', $last_name);
+    $statement->execute();
+    $response = $statement->fetchAll(PDO::FETCH_OBJ);
+    return $response;
+  } catch(PDOException $e){
+    echo '{"error":{"text" ' . __FUNCTION__ . ':' . $e->getMessage() . '}}';
+  }
+
+}
+
+function check_user_duplicate_username($username){
+
+  $query = "SELECT tbl_id, username
+            FROM user_tbl 
+            WHERE UPPER(TRIM(username)) = UPPER(TRIM(:username)) LIMIT 1;
+            ";
+
+  try{
+    $db = getConnection();
+    $statement = $db->prepare($query);
+    $statement->bindParam(':username', $username);
+    $statement->execute();
+    $response = $statement->fetchAll(PDO::FETCH_OBJ);
+    return $response;
+  } catch(PDOException $e){
+    echo '{"error":{"text" ' . __FUNCTION__ . ':' . $e->getMessage() . '}}';
+  }
+
+}
+
+function check_user_duplicate_email($email){
+
+  $query = "SELECT tbl_id, email
+            FROM user_tbl 
+            WHERE UPPER(TRIM(email)) = UPPER(TRIM(:email)) LIMIT 1;
+            ";
+
+  try{
+    $db = getConnection();
+    $statement = $db->prepare($query);
+    $statement->bindParam(':email', $email);
+    $statement->execute();
+    $response = $statement->fetchAll(PDO::FETCH_OBJ);
+    return $response;
+  } catch(PDOException $e){
+    echo '{"error":{"text" ' . __FUNCTION__ . ':' . $e->getMessage() . '}}';
+  }
+
+}
+
+
 function get_user_details($tbl_id){
 
   $query = "SELECT

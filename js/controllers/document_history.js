@@ -1421,7 +1421,7 @@ $(document)
       yAxis: {
           min: 0,
           title: {
-              text: 'Number of PR Requests'
+              text: 'COUNT'
           }
       },
       // tooltip: {
@@ -1477,7 +1477,7 @@ $(document)
     
     // console.table(resp)
 
-    let name = ['Approved PRs', 'Issued PRs', 'Pending PRs', 'Rejecte PRs']
+    let name = ['Approved Requests', 'Issued Requests', 'Pending Requests', 'Rejecte Requests']
 
     let getMonth = resp.map(v => v.month)
     let getApproved = resp.map(v => parseInt(v.approved))

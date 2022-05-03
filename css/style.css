@@ -14855,3 +14855,8 @@ div.no-data-yet i {
   border-radius: 0.25rem; }
   .custom-badge:empty {
     display: none; }
+
+
+  .input-custom-error {
+    border-color: #dc3545;
+  }
