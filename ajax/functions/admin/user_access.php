@@ -1,5 +1,34 @@
 <?php
 
+function update_user($first_name, $last_name, $email, $type, $tbl_id){
+
+  $query = "UPDATE user_tbl 
+            SET 
+              `first_name` = :first_name, 
+              `last_name` = :last_name,
+              `email` = :email, 
+              `type` = :type
+            WHERE tbl_id = :tbl_id
+          ";
+  try{
+    $db = getConnection();
+    $statement = $db->prepare($query);
+    $statement->execute(
+      array(
+        ":first_name" => $first_name,
+        ":last_name" => $last_name,
+        ":email" => $email,
+        ":type" => $type,
+        ":tbl_id" => $tbl_id
+        )
+    );
+  } catch(PDOException $e){
+    echo '{"error":{"text" ' . __FUNCTION__ . ':' . $e->getMessage() . '}}';
+  }
+
+
+}
+
 function add_user($first_name, $last_name, $username, $password, $email, $type){
 
   $query = "INSERT INTO user_tbl (first_name, last_name, username, `password`, email, `type`, `status`) 
@@ -25,11 +54,13 @@ function add_user($first_name, $last_name, $username, $password, $email, $type){
 
 }
 
-function check_user_duplicate_name($first_name, $last_name){
+function check_user_duplicate_name($first_name, $last_name, $tbl_id){
 
   $query = "SELECT tbl_id, first_name, last_name
             FROM user_tbl 
-            WHERE UPPER( CONCAT( TRIM(first_name),TRIM(last_name) )) = UPPER( CONCAT( TRIM(:first_name),TRIM(:last_name) )) LIMIT 1;
+            WHERE UPPER( CONCAT( TRIM(first_name),TRIM(last_name) )) = UPPER( CONCAT( TRIM(:first_name),TRIM(:last_name) )) 
+            AND tbl_id != :tbl_id
+            LIMIT 1;
             ";
 
   try{
@@ -37,6 +68,7 @@ function check_user_duplicate_name($first_name, $last_name){
     $statement = $db->prepare($query);
     $statement->bindParam(':first_name', $first_name);
     $statement->bindParam(':last_name', $last_name);
+    $statement->bindParam(':tbl_id', $tbl_id);
     $statement->execute();
     $response = $statement->fetchAll(PDO::FETCH_OBJ);
     return $response;
@@ -66,17 +98,20 @@ function check_user_duplicate_username($username){
 
 }
 
-function check_user_duplicate_email($email){
+function check_user_duplicate_email($email, $tbl_id){
 
   $query = "SELECT tbl_id, email
             FROM user_tbl 
-            WHERE UPPER(TRIM(email)) = UPPER(TRIM(:email)) LIMIT 1;
+            WHERE UPPER(TRIM(email)) = UPPER(TRIM(:email))
+            AND tbl_id != :tbl_id
+            LIMIT 1;
             ";
 
   try{
     $db = getConnection();
     $statement = $db->prepare($query);
     $statement->bindParam(':email', $email);
+    $statement->bindParam(':tbl_id', $tbl_id);
     $statement->execute();
     $response = $statement->fetchAll(PDO::FETCH_OBJ);
     return $response;
@@ -95,7 +130,8 @@ function get_user_details($tbl_id){
               last_name,
               username,
               email,
-              `status`
+              `status`,
+              `type`
             FROM user_tbl WHERE tbl_id = :tbl_id LIMIT 1
             ";
 
@@ -120,7 +156,8 @@ function get_users($offset, $search, $sort_by, $sort_direction){
               last_name,
               username,
               email,
-              `status`
+              `status`,
+              `type`
             FROM user_tbl
             WHERE
               CASE WHEN :search IS NULL OR :search = '' THEN

@@ -14,22 +14,18 @@ $params = $_POST['params'];
 
 $first_name = $params['first_name'];
 $last_name = $params['last_name'];
-$username = $params['username'];
 $email = $params['email'];
-$password = $params['password'];
 $type = $params['type'];
-$tbl_id = ''; // for add and update checking of duplicates
+$tbl_id = $params['tbl_id'];
 
 $data = [];
 
 $check_name = check_user_duplicate_name($first_name, $last_name, $tbl_id);
-$check_username = check_user_duplicate_username($username);
 $check_email = check_user_duplicate_email($email, $tbl_id);
 
-if(!empty($check_name) || !empty($check_username) || !empty($check_email)) {
+if(!empty($check_name) || !empty($check_email)) {
   $data = array(
     "name" => $check_name,
-    "username" => $check_username,
     "email" => $check_email,
     "status" => false
   );
@@ -38,20 +34,17 @@ if(!empty($check_name) || !empty($check_username) || !empty($check_email)) {
 
 } else {
 
-  $options = [
-    'cost' => 11
-  ];
 
-  $enc_password = password_hash($password, PASSWORD_BCRYPT, $options);
-
-  add_user($first_name, $last_name, $username, $enc_password, $email, $type);
+  update_user($first_name, $last_name, $email, $type, $tbl_id);
 
   $response = array(
-    "message" => "New user has been added successfully.",
+    "message" => "User has been updated successfully.",
     "status" => true
   );
   
   echo json_encode($response);
 }
   
+
+
 ?>

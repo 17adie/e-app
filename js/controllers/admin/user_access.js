@@ -1,5 +1,9 @@
 app.log.check_admin_session()
 
+const pwRegex = /(?=.*\d)(?=.*[a-zA-Z]).{8,}/;
+const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+let edit_tbl_id;
+
 const main = {
   api_request: function(api, params, cb){
 
@@ -33,13 +37,25 @@ const main = {
         password: pw,
         type: type,
       }
-      console.log({params})
+      // console.log({params})
       main.api_request('add_new_user', params, function(resp){
         return cb(resp)
       })
     }
   },
   update: {
+    user_details: function(fname, lname, email, type, tbl_id, cb){
+      const params = {
+        first_name: fname,
+        last_name: lname,
+        email: email,
+        type: type,
+        tbl_id: tbl_id
+      }
+      main.api_request('update_user_details', params, function(resp){
+        return cb(resp)
+      })
+    },
     user_status: function(tbl_id, stat, cb){
       const params = {
         tbl_id: tbl_id,
@@ -70,7 +86,7 @@ const main = {
       let unfiltered_rows_count;
  
           const columns = [
-              {data: "tbl_id", title: "ID#", className: 'tbl_id'},
+              {data: "tbl_id", title: "ID#", className: 'tbl_id', sortable: false},
               {data: "last_name", title: "Last Name", className: 'last_name'},
               {data: "first_name", title: "First Name", className: 'first_name'},
               {data: "username", title: "Username", className: 'username'},
@@ -120,9 +136,9 @@ const main = {
                 // 'print'
             ],
               columns: columns,
-              order: [ 0, "asc" ],  
+              order: [ 1, "asc" ],  
               columnDefs: [
-                { type: 'any-number', targets : 0 },
+                // { type: 'any-number', targets : 0 },
                 {
                     render: function ( data, type, row ) {
                         return row.tbl_id;
@@ -211,8 +227,8 @@ const main = {
   },
   validate_inputs: function(username, password, email, cb){
 
-    let validatePassword = password.match(/(?=.*\d)(?=.*[a-zA-Z]).{8,}/);
-    let validateEmail = email.match(/^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/)
+    let validatePassword = password.match(pwRegex);
+    let validateEmail = email.match(emailRegex)
 
     if(username.length < 6){
       Toast.fire({ icon: 'error', title: 'Username must be at least 6 character'})
@@ -240,9 +256,10 @@ $(document)
 
 .off('click', '.edit_user_details').on('click', '.edit_user_details', function(){
   let { tbl_id } = $(this).data()
-
+  edit_tbl_id = tbl_id;
   main.get.user_details(tbl_id, function(resp){
     let v = resp[0]
+    console.log(v)
 
     switch(v.status){
       case '1':
@@ -260,13 +277,60 @@ $(document)
     $('#first_name').val(v.first_name)
     $('#last_name').val(v.last_name)
     $('#user_email').val(v.email)
+    $('#usertype').val(v.type).trigger("change")
+
+
 
   })
 
 })
 
 .off('click', '#update_user').on('click', '#update_user', function(){
-  console.log('update user')
+  
+  let first_name = document.getElementById('first_name').value.trim(),
+      last_name = document.getElementById('last_name').value.trim(),
+      email = document.getElementById('user_email').value.trim(),
+      type = document.getElementById('usertype').value;
+
+      console.log({edit_tbl_id})
+
+      if(app.validate_input($('#modal-edit_user_details'))){
+
+        let validateEmail = email.match(emailRegex)
+
+        if(!validateEmail) {
+          Toast.fire({ icon: 'error', title: 'Invalid email format'})
+          return
+        }
+
+        main.update.user_details(first_name, last_name, email, type, edit_tbl_id, function(resp){
+
+          if(resp.status == true) {
+            Toast.fire({ icon: 'success', title: resp.message})
+          } else {
+
+            let {name, email } = resp
+
+            if(name.length != 0) {
+              Toast.fire({ icon: 'warning', title: 'User is already registerd'})
+              return
+            }
+           
+            if(email.length != 0) {
+              Toast.fire({ icon: 'warning', title: 'Email is already taken'})
+              return
+            }
+       
+          }
+
+        })
+
+      } else {
+        Swal.fire('Incomplete Details','Please complete all the required info marked with (*)','error')
+      }
+  
+
+
 })
 
 .off('click', '#add_user').on('click', '#add_user', function(){
@@ -283,12 +347,12 @@ $(document)
     main.validate_inputs(username, password, email, function(resp){
       if(resp) {
         main.add.user(first_name, last_name, username, email, password, type, function(resp){
-          console.log(resp)
-          console.log(resp.status)
+          // console.log(resp)
+          // console.log(resp.status)
 
           if(resp.status == true) {
             $('#modal-add_user').modal('hide')
-            Toast.fire({ icon: 'success', title: 'User has been addedd successfully.'})
+            Toast.fire({ icon: 'success', title: resp.message})
 
           } else {
 
