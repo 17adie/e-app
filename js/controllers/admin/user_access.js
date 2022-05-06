@@ -300,6 +300,7 @@ $(document)
 
         if(!validateEmail) {
           Toast.fire({ icon: 'error', title: 'Invalid email format'})
+          
           return
         }
 
@@ -307,6 +308,7 @@ $(document)
 
           if(resp.status == true) {
             Toast.fire({ icon: 'success', title: resp.message})
+            $('#users_tbl').DataTable().draw(false) // refresh with false = to retain page when draw
           } else {
 
             let {name, email } = resp
@@ -353,7 +355,7 @@ $(document)
           if(resp.status == true) {
             $('#modal-add_user').modal('hide')
             Toast.fire({ icon: 'success', title: resp.message})
-
+            $('#users_tbl').DataTable().draw(false) // refresh with false = to retain page when draw
           } else {
 
             let {name, username, email } = resp
@@ -441,7 +443,7 @@ $(document)
 
 
 // reset all
-$('#modal-add_user').on('hidden.bs.modal', function (e) {
+$('#modal-add_user, #modal-edit_user_details').on('hidden.bs.modal', function (e) {
   main.reset($(this))
 })
 

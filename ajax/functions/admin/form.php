@@ -1,5 +1,152 @@
 <?php
 
+function get_form_details($tbl_id){
+
+  $query = "SELECT
+              tbl_id,
+              category,
+              form_code,
+              form,
+              `url`,
+              form_status
+            FROM forms_tbl WHERE tbl_id = :tbl_id LIMIT 1
+            ";
+
+  try{
+    $db = getConnection();
+    $statement = $db->prepare($query);
+    $statement->bindParam(':tbl_id', $tbl_id);
+    $statement->execute();
+    $response = $statement->fetchAll(PDO::FETCH_OBJ);
+    return $response;
+  } catch(PDOException $e){
+    echo '{"error":{"text" ' . __FUNCTION__ . ':' . $e->getMessage() . '}}';
+  }
+
+}
+
+function update_filename($filename, $tbl_id){
+
+  $query = "UPDATE forms_tbl 
+            SET 
+              `url` = :filename
+            WHERE tbl_id = :tbl_id LIMIT 1
+          ";
+  try{
+    $db = getConnection();
+    $statement = $db->prepare($query);
+    $statement->execute(
+      array(
+        ":filename" => $filename,
+        ":tbl_id" => $tbl_id
+        )
+    );
+  } catch(PDOException $e){
+    echo '{"error":{"text" ' . __FUNCTION__ . ':' . $e->getMessage() . '}}';
+  }
+
+}
+
+function update_form($category, $form_code, $form, $tbl_id){
+
+  $query = "UPDATE forms_tbl 
+            SET 
+              `category` = :category, 
+              `form_code` = :form_code,
+              `form` = :form
+            WHERE tbl_id = :tbl_id LIMIT 1
+          ";
+  try{
+    $db = getConnection();
+    $statement = $db->prepare($query);
+    $statement->execute(
+      array(
+        ":category" => $category,
+        ":form_code" => $form_code,
+        ":form" => $form,
+        ":tbl_id" => $tbl_id
+        )
+    );
+  } catch(PDOException $e){
+    echo '{"error":{"text" ' . __FUNCTION__ . ':' . $e->getMessage() . '}}';
+  }
+
+}
+
+function add_new_form($category, $form_code, $form){
+
+  $query = "INSERT INTO forms_tbl (category, form_code, form, `form_status`) 
+            VALUES (:category, :form_code, :form, 1)
+          ";
+  try{
+    $db = getConnection();
+    $statement = $db->prepare($query);
+    $statement->execute(
+      array(
+        ":category" => $category,
+        ":form_code" => $form_code,
+        ":form" => $form
+        )
+    );
+
+    // get last inserted ID
+    $lastId = $db->lastInsertId();
+
+    return $lastId;
+
+  } catch(PDOException $e){
+    echo '{"error":{"text" ' . __FUNCTION__ . ':' . $e->getMessage() . '}}';
+  }
+
+
+}
+
+function check_form_name_duplicate($form, $tbl_id){
+
+  $query = "SELECT tbl_id, form
+            FROM forms_tbl 
+            WHERE UPPER(TRIM(form)) = UPPER(TRIM(:form))
+            AND tbl_id != :tbl_id
+            LIMIT 1;
+            ";
+
+  try{
+    $db = getConnection();
+    $statement = $db->prepare($query);
+    $statement->bindParam(':form', $form);
+    $statement->bindParam(':tbl_id', $tbl_id);
+    $statement->execute();
+    $response = $statement->fetchAll(PDO::FETCH_OBJ);
+    return $response;
+  } catch(PDOException $e){
+    echo '{"error":{"text" ' . __FUNCTION__ . ':' . $e->getMessage() . '}}';
+  }
+
+}
+
+function check_form_code_duplicate($form_code, $tbl_id){
+
+  $query = "SELECT tbl_id, form
+            FROM forms_tbl 
+            WHERE UPPER(TRIM(form_code)) = UPPER(TRIM(:form_code))
+            AND tbl_id != :tbl_id
+            LIMIT 1;
+            ";
+
+  try{
+    $db = getConnection();
+    $statement = $db->prepare($query);
+    $statement->bindParam(':form_code', $form_code);
+    $statement->bindParam(':tbl_id', $tbl_id);
+    $statement->execute();
+    $response = $statement->fetchAll(PDO::FETCH_OBJ);
+    return $response;
+  } catch(PDOException $e){
+    echo '{"error":{"text" ' . __FUNCTION__ . ':' . $e->getMessage() . '}}';
+  }
+
+}
+
 function get_forms($offset, $search, $sort_by, $sort_direction){
 
   $query = "SELECT

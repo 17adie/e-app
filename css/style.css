@@ -14858,5 +14858,8 @@ div.no-data-yet i {
 
 
   .input-custom-error {
-    border-color: #dc3545;
+    /* not working in input type file */
+    /* border-color: #dc3545; */ 
+    
+    border: 1px solid #dc3545;
   }

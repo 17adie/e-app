@@ -34,7 +34,7 @@
             <div class="card">
                 <h5 class="card-header custom-card-header d-flex justify-content-between">
                     Form List
-                    <button class="btn btn-sm" id="add_form">Add Form</button>
+                    <button class="btn btn-sm" id="add_form_btn" data-toggle="modal" data-target="#modal-add_form">Add Form</button>
                   </h5>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -44,6 +44,95 @@
                     </div>
                 </div>
             </div>
+            <!-- card end -->
+
+          <!-- ADD FORM MODAL -->
+          <div id="modal-add_form" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false" >
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add Form</h5>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container">
+                          
+                          <div class="form-group">
+                            <label for="add_category">Category</label><span class="required"> * </span>
+                            <select class="custom-select" id="add_category">
+                              <option value="" selected>Select Category..</option>
+                              <option value="HR">HR</option>
+                              <option value="Purchasing">Purchasing</option>
+                            </select>
+                          </div>
+                          <div class="form-group">
+                            <label for="add_form">Form Name</label><span class="required"> * </span>
+                            <input type="text" class="form-control" id="add_form" placeholder="Enter Form Name">
+                          </div>
+                          <div class="form-group">
+                            <label for="add_form_code">Form Code</label><span class="required"> * </span>
+                            <input type="text" class="form-control" id="add_form_code" placeholder="Enter Form Code">
+                          </div>
+                          <div class="form-group">
+                            <label for="add_file">File</label><span class="required"> * </span>
+                            <input type="file" class="form-control-file" id="add_file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, .csv" aria-describedby="fileHelp">
+                            <small id="fileHelp" class="form-text text-muted">Accept (.csv and .xlsx) formats</small>
+                          </div>
+
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-success" id="add_new_form_btn" >Add New Form</button>
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+          </div>
+        <!-- MODAL END -->
+
+        <!-- UPDATE FORM MODAL -->
+        <div id="modal-update_form" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false" >
+          <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h5 class="modal-title">Update Form</h5>
+                  </div>
+                  <div class="modal-body">
+                      <div class="container">
+                        
+                        <div class="form-group">
+                          <label for="update_category">Category</label><span class="required"> * </span>
+                          <select class="custom-select" id="update_category">
+                            <option value="" selected>Select Category..</option>
+                            <option value="HR">HR</option>
+                            <option value="Purchasing">Purchasing</option>
+                          </select>
+                        </div>
+                        <div class="form-group">
+                          <label for="update_form">Form Name</label><span class="required"> * </span>
+                          <input type="text" class="form-control" id="update_form" placeholder="Enter Form Name">
+                        </div>
+                        <div class="form-group">
+                          <label for="update_form_code">Form Code</label><span class="required"> * </span>
+                          <input type="text" class="form-control" id="update_form_code" placeholder="Enter Form Code">
+                        </div>
+                        <div class="form-group">
+                          <label for="update_file">File</label>
+                          <input type="file" class="form-control-file" id="update_file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, .csv" aria-describedby="fileHelp">
+                          <small id="fileHelp" class="form-text text-muted">Accept (.csv and .xlsx) formats</small>
+                        </div>
+
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                      <button type="button" class="btn btn-success" id="update_form_btn" >Update Form</button>
+                      <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  </div>
+              </div>
+          </div>
+        </div>
+      <!-- MODAL END -->
+
+
     
         </div>
     </div>

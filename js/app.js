@@ -21,7 +21,7 @@ const app = {
         $('span.required',form).each(function(){
             const
                 sp = $(this),
-                inp = sp.next('input[type="text"],input[type="password"],input[type="email"],select'),
+                inp = sp.next('input[type="text"],input[type="password"],input[type="email"],input[type="file"],select'),
                 valid = function(inp,v){
                     if(v){
                         inp.removeClass('input-custom-error')
@@ -136,6 +136,7 @@ const app = {
             var form_data = new FormData();
             form_data.append('file', file_data);
 
+            
             $.ajax({
                 type: 'post',
                 url: server_url + '/ajax/functions/uploader/'+uploader_name+'.php',
