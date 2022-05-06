@@ -247,6 +247,17 @@ const main = {
     
     return cb(true)
   },
+  loader: function(title, html){
+    Swal.fire({
+      title: title,
+      html: html,
+      showConfirmButton: false,
+      allowOutsideClick: false,
+      willOpen: () => {
+          Swal.showLoading()
+      },
+    }); 
+  },
 
 }
 
@@ -294,6 +305,8 @@ $(document)
 
       console.log({edit_tbl_id})
 
+      main.loader('Please Wait!', 'data updating...')
+
       if(app.validate_input($('#modal-edit_user_details'))){
 
         let validateEmail = email.match(emailRegex)
@@ -307,6 +320,7 @@ $(document)
         main.update.user_details(first_name, last_name, email, type, edit_tbl_id, function(resp){
 
           if(resp.status == true) {
+            swal.close();
             Toast.fire({ icon: 'success', title: resp.message})
             $('#users_tbl').DataTable().draw(false) // refresh with false = to retain page when draw
           } else {
@@ -343,6 +357,9 @@ $(document)
       email = document.getElementById('add_user_email').value.trim(),
       password = document.getElementById('add_password').value.trim(),
       type = document.getElementById('add_usertype').value
+
+  main.loader('Please Wait!', 'data upoading...')
+
   
   if(app.validate_input($('#modal-add_user'))){
 
@@ -354,6 +371,7 @@ $(document)
 
           if(resp.status == true) {
             $('#modal-add_user').modal('hide')
+            swal.close();
             Toast.fire({ icon: 'success', title: resp.message})
             $('#users_tbl').DataTable().draw(false) // refresh with false = to retain page when draw
           } else {
