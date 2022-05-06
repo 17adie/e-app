@@ -31,7 +31,7 @@ function update_user($first_name, $last_name, $email, $type, $tbl_id){
 
 function add_user($first_name, $last_name, $username, $password, $email, $type){
 
-  $query = "INSERT INTO user_tbl (first_name, last_name, username, `password`, email, `type`, `status`) 
+  $query = "INSERT INTO user_tbl (`first_name`, `last_name`, `username`, `password`, `email`, `type`, `status`) 
             VALUES (:first_name, :last_name, :username, :password, :email, :type, 1)
           ";
   try{
