@@ -138,6 +138,25 @@ const main = {
     }
   },
   get: {
+    form_category: function(el, cb) {
+
+    main.api_request('get_category', null, function(resp){
+
+      $(el).html('<option value="" selected>Select Category...</option>')
+
+      const cat = resp.map( v => {
+        return(`
+        <option value="${v.category}">${v.category}</opotion>
+        `)
+      })
+
+      $(el).append(cat)
+
+      return cb()
+
+    })
+
+    },
     form_details: function(tbl_id, cb){
       const params = {
         tbl_id: tbl_id
@@ -148,6 +167,14 @@ const main = {
     },
   },
   add: {
+    category: function(category, cb) {
+      const params = {
+        category: category
+      }
+      main.api_request('add_form_category', params, function(resp){
+        return cb(resp)
+      })
+    },
     new_form: function(category, form_name, form_code, cb){
       const params = {
         category: category,
@@ -205,6 +232,46 @@ main.tbl.forms()
 
 $(document)
 
+.off('click', '#add_new_category_btn').on('click', '#add_new_category_btn', function(){
+
+  let cat = document.getElementById('add_form_category').value.trim()
+
+  if(cat.length== 0) {
+    Toast.fire({ icon: 'error', title: 'Please enter valid name'})
+    return
+  } 
+
+  main.add.category(cat, function(resp) {
+
+    if(resp.status == true){
+      
+      main.get.form_category('#add_category', function(resp) {
+        $('.modal_add_category').modal('hide')
+        document.getElementById('add_form_category').value = '' // clear input after success
+        Toast.fire({ icon: 'success', title: resp.message})
+      })
+    
+    } else {
+
+      let { category_name } = resp
+
+          if(category_name.length != 0) {
+            Toast.fire({ icon: 'warning', title: 'Form category name is already exist'})
+            return
+          }
+    }
+
+  })
+
+
+})
+
+.off('click', '#add_form_btn').on('click', '#add_form_btn', function(){
+  main.get.form_category('#add_category', function(resp) {
+    
+  })
+})
+
 .off('click', '.form_edit_btn').on('click', '.form_edit_btn', function(){
   let { tbl_id } = $(this).data()
 
@@ -212,7 +279,8 @@ $(document)
 
   // console.log({tbl_id})
 
-  main.get.form_details(tbl_id, function(resp){
+  main.get.form_category('#update_category', function(resp){
+    main.get.form_details(tbl_id, function(resp){
      console.log(resp)
      let v = resp[0]
 
@@ -220,7 +288,10 @@ $(document)
      document.getElementById('update_form').value = v.form
      document.getElementById('update_form_code').value = v.form_code
 
+    })
   })
+
+  
 
 })
 
@@ -288,7 +359,7 @@ $(document)
 .off('click', '#add_new_form_btn').on('click', '#add_new_form_btn', function(){
 
     let new_form = $('#add_file'),
-        category = document.getElementById('add_category').value;
+        category = document.getElementById('add_category').value,
         form_name = document.getElementById('add_form').value.trim(),
         form_code = document.getElementById('add_form_code').value.trim();
   

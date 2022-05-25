@@ -1,5 +1,66 @@
 <?php
 
+function add_new_category($category){
+
+  $query = "INSERT INTO form_category_tbl (`category`, `date_added`, `form_status`) 
+            VALUES (:category, NOW(), 1)
+          ";
+  try{
+    $db = getConnection();
+    $statement = $db->prepare($query);
+    $statement->execute(
+      array(
+        ":category" => $category
+        )
+    );
+  } catch(PDOException $e){
+    echo '{"error":{"text" ' . __FUNCTION__ . ':' . $e->getMessage() . '}}';
+  }
+
+
+}
+
+function check_category_name_duplicate($category){
+
+  $query = "SELECT category
+            FROM form_category_tbl 
+            WHERE UPPER(TRIM(category)) = UPPER(TRIM(:category))
+            LIMIT 1;
+            ";
+
+  try{
+    $db = getConnection();
+    $statement = $db->prepare($query);
+    $statement->bindParam(':category', $category);
+    $statement->execute();
+    $response = $statement->fetchAll(PDO::FETCH_OBJ);
+    return $response;
+  } catch(PDOException $e){
+    echo '{"error":{"text" ' . __FUNCTION__ . ':' . $e->getMessage() . '}}';
+  }
+
+}
+
+function get_category(){
+
+  $query = "SELECT DISTINCT
+              tbl_id,
+              category,
+              form_status
+            FROM form_category_tbl WHERE form_status = 1
+            ";
+  try{
+    $db = getConnection();
+    $statement = $db->prepare($query);
+    $statement->execute();
+    $response = $statement->fetchAll(PDO::FETCH_OBJ);
+    return $response;
+  } catch(PDOException $e){
+    echo '{"error":{"text" ' . __FUNCTION__ . ':' . $e->getMessage() . '}}';
+  }
+
+}
+
 function get_form_details($tbl_id){
 
   $query = "SELECT
