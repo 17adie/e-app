@@ -171,6 +171,16 @@ const main = {
     app.crud.request('sp-update_approval_status', params, function (resp) {
       return cb(resp)
     })
+  }, 
+  update_file_name: function(tbl_id, new_filename, cb){
+    const params = {
+      _tbl_id: tbl_id,
+      _new_filename: new_filename,
+    };
+    console.log({params})
+    app.crud.request('sp-update_filename_when_approved', params, function (resp) {
+      return cb(resp)
+    })
   },  
 }
 }
@@ -209,20 +219,80 @@ $(document)
 
   // })
 
+  // Swal.fire({
+  //   title:"Are you sure you want to approve this document?",
+  //   html: text,
+  //   input: 'text',
+  //   inputPlaceholder: 'Enter Remarks (optional)',
+  //   icon:'question',
+  //   showCancelButton: true,
+  //   confirmButtonText: 'Yes!',
+  //   showLoaderOnConfirm: true,
+  //   allowEscapeKey: false,
+  //   allowOutsideClick: false,
+  //   preConfirm: (approver_remarks) => {
+  //     console.log({approver_remarks})
+     
+  //       return new Promise((resolve, reject) => { // for sweetalert loader ..
+  //         main.fn.docs_verification(tbl_id, approver_id, 'a', '', '', approver_remarks, function(resp){
+  //           app.email_notification({ // notification for notifed person
+  //             doc_title : document_title,  
+  //             req_message: requestor_message,
+  //             email_to : email_to, 
+  //             trans_no : trans_no,
+  //             requestor : requestor_name,
+  //             form_name : form,
+  //             date_request : date_request,
+  //             approver_remarks: approver_remarks == '' ? 'N/A' : approver_remarks,
+  //             file_name: 'email_notification_from_approver'}, function(resp){
+  //             console.log('notif', {resp})
+  //             return resolve(resp)
+  //           })
+  //         })
+  //       }).catch(err => { console.log(err) });
+         
+  //     },
+  // }).then((result) => {
+  //   if (result.isConfirmed) {
+  //     Toast.fire({ icon: 'success', title: 'Document approved!' })
+  //     $('#for_approval_request_tbl').DataTable().draw(false) // refresh with false = to retain page when draw
+  //   }
+  // })
+
   Swal.fire({
     title:"Are you sure you want to approve this document?",
-    html: text,
-    input: 'text',
-    inputPlaceholder: 'Enter Remarks (optional)',
+    html: `<div class="form-group">
+              <textarea type="text" class="form-control" id="approver_remarks" placeholder="Enter Remarks (optional)"></textarea>
+            </div>
+            <div class="form-group">
+              <input type="file" class="form-control" id="new_file" accept="application/pdf,application/vnd.ms-excel,.xlsx, .xls, .csv">
+              <small class="form-text text-muted">Attach file (optional)</small>
+            </div>`,
     icon:'question',
     showCancelButton: true,
     confirmButtonText: 'Yes!',
     showLoaderOnConfirm: true,
     allowEscapeKey: false,
     allowOutsideClick: false,
-    preConfirm: (approver_remarks) => {
-      console.log({approver_remarks})
-     
+    preConfirm: () => {
+      let approver_remarks = Swal.getPopup().querySelector('#approver_remarks').value,
+          new_file = $('#new_file')
+
+        // console.log({approver_remarks})
+        // console.log({new_file})
+
+        // app.uploader(new_file, 'upload_file',function (cb) {
+        //   let file = cb
+
+        //   if(file != '') {
+        //     main.fn.update_file_name(tbl_id, file, function(resp){
+              
+        //     })
+        //   }
+          
+        // })
+
+
         return new Promise((resolve, reject) => { // for sweetalert loader ..
           main.fn.docs_verification(tbl_id, approver_id, 'a', '', '', approver_remarks, function(resp){
             app.email_notification({ // notification for notifed person
@@ -236,7 +306,22 @@ $(document)
               approver_remarks: approver_remarks == '' ? 'N/A' : approver_remarks,
               file_name: 'email_notification_from_approver'}, function(resp){
               console.log('notif', {resp})
-              return resolve(resp)
+
+              app.uploader(new_file, 'upload_file',function (cb) {
+                let file = cb
+      
+                if(file != '') {
+                  main.fn.update_file_name(tbl_id, file, function(resp){
+                   return resolve(resp) 
+                  })
+                }
+
+                return resolve(resp) 
+                
+              })
+
+
+              
             })
           })
         }).catch(err => { console.log(err) });
